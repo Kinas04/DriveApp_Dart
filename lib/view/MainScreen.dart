@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'SchermataCalendario.dart';
 import 'SchermataAccount.dart';
 import 'SchermataEsiti.dart';
 import 'SchermataPrenota.dart';
@@ -15,11 +16,9 @@ class _MainScreenState extends State<MainScreen> {
 
   // Lista delle schermate collegate alla barra di navigazione
   static final List<Widget> _pages = <Widget>[
-    //Per ora metto del testo giusto per "chiudere i buchi" nel frattempo che implemento le altre
-    const Center(child: Text('Calendario')),
+    const SchermataCalendario(),
     const SchermataEsiti(),
     const SchermataPrenota(),
-    const Center(child: Text('Quiz')),
     const SchermataAccount(),
   ];
 
@@ -33,7 +32,7 @@ class _MainScreenState extends State<MainScreen> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               spreadRadius: 2,
             ),
@@ -70,11 +69,6 @@ class _MainScreenState extends State<MainScreen> {
               NavigationDestination(
                 icon: Icon(Icons.add),
                 label: 'Prenota',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.directions_car_outlined),
-                selectedIcon: Icon(Icons.directions_car),
-                label: 'Quiz',
               ),
               NavigationDestination(
                 icon: Icon(Icons.account_circle_outlined),

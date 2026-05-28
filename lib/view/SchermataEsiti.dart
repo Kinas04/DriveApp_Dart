@@ -1,53 +1,127 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widget_previews.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import '../ui/theme/UtenteViewModel.dart';
+import '../model/EsitoEsame.dart';
+import '../model/Esame.dart';
 
-@Preview()
-Widget previewSchermataEsiti() {
-  return const MaterialApp(
-    home: SchermataEsiti(),
-  );
+class SchermataEsiti extends StatefulWidget {
+  const SchermataEsiti({super.key});
+
+  @override
+  State<SchermataEsiti> createState() => _SchermataEsitiState();
 }
 
+class _SchermataEsitiState extends State<SchermataEsiti> {
+  List<EsitoEsame> _esiti = [];
+  Map<String, Esame> _dettagliEsami = {};
+  bool _inCaricamento = true;
+  bool _erroreCaricamento = false;
 
-class SchermataEsiti extends StatelessWidget {
-  const SchermataEsiti({super.key});
+  @override
+  void initState() {
+    super.initState();
+    //richiediamo i dati al database non appena la schermata viene inizializzata
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _caricaDati();
+    });
+  }
+
+  //chiamata al ViewModel per recuperare lo storico degli esiti dell'utente
+  Future<void> _caricaDati() async {
+    final viewModel = Provider.of<UtenteViewModel>(context, listen: false);
+    setState(() {
+      _inCaricamento = true;
+      _erroreCaricamento = false;
+    });
+
+    await viewModel.caricaEsiti((esiti, dettagli, errore) {
+      if (mounted) {
+        setState(() {
+          _esiti = esiti;
+          _dettagliEsami = dettagli;
+          _erroreCaricamento = errore;
+          _inCaricamento = false;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Esiti esami"),
-        titleSpacing: 10,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          //Utilizzo una widget personalizzato dedicato che creo sotto e richiamo qua
-          _buildEsitoCard(
-            context,
-            isPromosso: true,
-            titolo: "PROMOSSO",
-            esame: "Esame di teoria",
-            patente: "patente B",
-            dataLuogo: "Ven 17 apr, Campobasso",
-            color: const Color(0xFFDEE1F3),
-          ),
-          const SizedBox(height: 16),
-          _buildEsitoCard(
-            context,
-            isPromosso: false,
-            titolo: "RESPINTO",
-            esame: "Esame di guida",
-            patente: "patente B",
-            dataLuogo: "Gio 30 apr, Campobasso",
-            color: const Color(0xFFF9F1F7),
-          ),
-        ],
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 24, 16, 16),
+              child: Text(
+                "Esiti esami",
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(child: _buildContenuto()),
+          ],
+        ),
       ),
     );
   }
 
+  //gestisce la visualizzazione della lista, del caricamento o dell'eventuale errore
+  Widget _buildContenuto() {
+    if (_inCaricamento) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_erroreCaricamento) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("Errore durante il caricamento degli esiti", style: TextStyle(color: Colors.red)),
+            const SizedBox(height: 16),
+            ElevatedButton(onPressed: _caricaDati, child: const Text("RIPROVA")),
+          ],
+        ),
+      );
+    }
+
+    if (_esiti.isEmpty) {
+      return const Center(
+        child: Text("Nessun esito disponibile", style: TextStyle(color: Colors.black54)),
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      itemCount: _esiti.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 16),
+      itemBuilder: (context, index) {
+        final esito = _esiti[index];
+        final esame = _dettagliEsami[esito.idEsame];
+        final isPromosso = esito.esito.toLowerCase() == "idoneo" || esito.esito.toLowerCase() == "promosso";
+        
+        final formatData = DateFormat('EEE d MMM', 'it_IT');
+        final stringaDataLuogo = esame != null 
+            ? "${formatData.format(esame.data)}, ${esame.luogo}" 
+            : "Data non disponibile";
+
+        return _buildEsitoCard(
+          context,
+          isPromosso: isPromosso,
+          titolo: esito.esito.toUpperCase(),
+          esame: esame != null ? "Esame di ${esame.tipologia}" : "Esame sconosciuto",
+          patente: esame != null ? "patente ${esame.categoriaPatente}" : "",
+          dataLuogo: stringaDataLuogo,
+          color: isPromosso ? const Color(0xFFDEE1F3) : const Color(0xFFF9F1F7),
+        );
+      },
+    );
+  }
+
+  //crea la card grafica per visualizzare l'esito (Promosso/Respinto)
   Widget _buildEsitoCard(
     BuildContext context, {
     required bool isPromosso,
@@ -94,14 +168,15 @@ class SchermataEsiti extends StatelessWidget {
                     color: Colors.black87,
                   ),
                 ),
-                Text(
-                  patente,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                if (patente.isNotEmpty)
+                  Text(
+                    patente,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
                   ),
-                ),
                 const SizedBox(height: 8),
                 Text(
                   dataLuogo,
@@ -113,8 +188,13 @@ class SchermataEsiti extends StatelessWidget {
               ],
             ),
           ),
+          //pulsante per aprire i dettagli dell'esito
           InkWell(
-            onTap: () {/* Da implementare: navigazione al dettaglio esito */},
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Dettaglio esame in arrivo...")),
+              );
+            },
             child: const Row(
               children: [
                 Text(

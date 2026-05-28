@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "50112590303",
+    "project_id": "driveapp-b55c3",
+    "storage_bucket": "driveapp-b55c3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:50112590303:android:4d180037c5a63c6b06d46a",
+        "android_client_info": {
+          "package_name": "com.example.driveapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgArS56jH187H6AmgKy5GAsSNhcJEabSQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
