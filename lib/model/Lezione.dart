@@ -10,29 +10,41 @@ class Lezione {
   String aula;
   String argomento;
 
-  Lezione({
-    required this.idLezione,
-    required this.dataLezione,
-    required this.oraInizio,
-    required this.oraFine,
-    required this.aula,
-    required this.argomento,
-  });
+  Lezione(
+    this.idLezione,
+    this.dataLezione,
+    this.oraInizio,
+    this.oraFine,
+    this.aula,
+    this.argomento,
+  );
 
-  factory Lezione.fromMap(Map<String, dynamic> map, String id) {
+  /*Per ogni classe, uso un metodo "factory" di Dart per convertire i campi
+  provenienti dal DB Firebase in campi utilizzabili dal codice Dart*/
+  factory Lezione.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    SnapshotOptions? options,
+  ) {
+    /*Facciamo riferimento ai dati mappati attraverso la variabile final data
+    Viene catturato uno snapshot dei dati*/
+    final data = snapshot.data();
     return Lezione(
-      idLezione: id,
-      dataLezione: (map['dataLezione'] as Timestamp).toDate(),
-      oraInizio: map['oraInizio'] ?? '',
-      oraFine: map['oraFine'] ?? '',
-      aula: map['aula'] ?? '',
-      argomento: map['argomento'] ?? '',
+      snapshot.id,
+      //Convertiamo in Timestamp comprensibile da Firebase
+      (data?['dataLezione'] as Timestamp).toDate(),
+      data?['oraInizio'] ?? '',
+      data?['oraFine'] ?? '',
+      data?['aula'] ?? '',
+      data?['argomento'] ?? '',
     );
   }
 
-  Map<String, dynamic> toMap() {
+  /*Poi, quando devo fare scritture sul DB, poichè i dati su Firebase
+  sono mappati (chiave,valore), rimappo nuovamente tutti parametri del costruttore
+  con un metodo di tipo Map*/
+  Map<String, dynamic> toFirestore() {
     return {
-      'dataLezione': dataLezione,
+      'dataLezione': Timestamp.fromDate(dataLezione),
       'oraInizio': oraInizio,
       'oraFine': oraFine,
       'aula': aula,
