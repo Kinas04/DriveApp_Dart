@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../ui/theme/UtenteViewModel.dart';
+import '../viewModel/UtenteViewModel.dart';
+import '../viewModel/PrenotaViewModel.dart';
 import '../model/Esame.dart';
 import '../model/SlotGuida.dart';
 
@@ -48,14 +49,20 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
 
   //chiamata al ViewModel per caricare le liste degli elementi prenotabili dal database
   Future<void> _caricaDati() async {
-    final viewModel = Provider.of<UtenteViewModel>(context, listen: false);
+    final utenteViewModel = Provider.of<UtenteViewModel>(context, listen: false);
+    final prenotaViewModel = Provider.of<PrenotaViewModel>(context, listen: false);
+
+    final utente = utenteViewModel.utenteLoggato;
+    if (utente == null) return;
     
     setState(() {
       _inCaricamento = true;
       _erroreCaricamento = false;
     });
 
-    await viewModel.caricaElementiPrenotabili(
+    await prenotaViewModel.caricaElementiPrenotabili(
+      utente.categoriaRichiesta,
+      utente.codiceFiscale,
       _tabController.index,
       (esami, guide, prenotati, errore) {
         if (mounted) {
@@ -89,11 +96,16 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
               TextButton(
                 onPressed: _inPrenotazione ? null : () async {
                   setDialogState(() => _inPrenotazione = true);
-                  final viewModel = Provider.of<UtenteViewModel>(context, listen: false);
+                  final utenteViewModel = Provider.of<UtenteViewModel>(context, listen: false);
+                  final prenotaViewModel = Provider.of<PrenotaViewModel>(context, listen: false);
                   
-                  await viewModel.prenotaElemento(
+                  final cf = utenteViewModel.utenteLoggato?.codiceFiscale;
+                  if (cf == null) return;
+
+                  await prenotaViewModel.prenotaElemento(
                     _tabController.index,
                     id,
+                    cf,
                     (successo, messaggio) {
                       if (mounted) {
                         setDialogState(() => _inPrenotazione = false);

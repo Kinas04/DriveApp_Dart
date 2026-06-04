@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../ui/theme/UtenteViewModel.dart';
+import '../viewModel/CalendarioViewModel.dart';
 import '../model/Lezione.dart';
 import '../model/Esame.dart';
 import '../model/SlotGuida.dart';
@@ -35,7 +35,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
 
   //chiamata al ViewModel per recuperare gli eventi filtrati per data e tab selezionato
   Future<void> _caricaEventi() async {
-    final viewModel = Provider.of<UtenteViewModel>(context, listen: false);
+    final viewModel = Provider.of<CalendarioViewModel>(context, listen: false);
     
     setState(() {
       _inCaricamento = true;
@@ -61,7 +61,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
 
   @override
   Widget build(BuildContext context) {
-    //determiniamo se lo schermo è compatto o tablet per gestire il layout responsive
+    //determiniamo se lo schermo è cellulare o tablet per gestire il layout responsive
     final double larghezzaSchermo = MediaQuery.of(context).size.width;
     final bool isCompatto = larghezzaSchermo < 600;
 

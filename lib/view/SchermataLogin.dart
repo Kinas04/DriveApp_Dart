@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../ui/theme/UtenteViewModel.dart';
+import '../viewModel/UtenteViewModel.dart';
 
 class SchermataLogin extends StatefulWidget {
   final VoidCallback onVaiARegistrazione;

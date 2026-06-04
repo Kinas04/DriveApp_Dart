@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../model/Utente.dart';
-import '../../model/Lezione.dart';
-import '../../model/Esame.dart';
-import '../../model/SlotGuida.dart';
-import '../../model/EsitoEsame.dart';
-import '../../repository/RepositoryInterface.dart';
-import '../../repository/ConnectivityChecker.dart';
-import '../../data/PreferenzeUtente.dart';
+import '../model/Utente.dart';
+import '../repository/RepositoryInterface.dart';
+import '../repository/ConnectivityChecker.dart';
+import '../data/PreferenzeUtente.dart';
 
 class UtenteViewModel extends ChangeNotifier {
   //richiamo dalla repository le interfacce e il check per la connessione
@@ -140,79 +136,6 @@ class UtenteViewModel extends ChangeNotifier {
     await userPrefs.logout();
     await repository.signOut();
     notifyListeners();
-  }
-
-  //carica le lezioni, gli esami o le guide in base alla data e al tab selezionato
-  Future<void> caricaEventiCalendario(
-      DateTime data,
-      int tab,
-      Function(List<Lezione>, List<Esame>, List<SlotGuida>, bool) onRisultato
-  ) async {
-    try {
-      final inizio = DateTime(data.year, data.month, data.day);
-      final fine = inizio.add(const Duration(days: 1));
-      
-      if (tab == 0) {
-        final lezioni = await repository.getLezioni(inizio, fine);
-        onRisultato(lezioni, [], [], false);
-      } else if (tab == 1) {
-        final esami = await repository.getEsami(inizio, fine);
-        onRisultato([], esami, [], false);
-      } else {
-        final guide = await repository.getGuide(inizio, fine);
-        onRisultato([], [], guide, false);
-      }
-    } catch (e) {
-      onRisultato([], [], [], true);
-    }
-  }
-
-  //recupera tutti gli esiti degli esami sostenuti dall'utente loggato
-  Future<void> caricaEsiti(Function(List<EsitoEsame>, Map<String, Esame>, bool) onRisultato) async {
-    if (_utenteLoggato == null) return;
-    try {
-      final esiti = await repository.getEsiti(_utenteLoggato!.codiceFiscale);
-      final ids = esiti.map((e) => e.idEsame).toList();
-      final dettagli = await repository.getEsamiPerId(ids);
-      final mappaDettagli = { for (var e in dettagli) e.idEsame : e };
-      onRisultato(esiti, mappaDettagli, false);
-    } catch (e) {
-      onRisultato([], {}, true);
-    }
-  }
-
-  //recupera la lista degli elementi che l'utente può ancora prenotare dal sistema
-  Future<void> caricaElementiPrenotabili(int tab, Function(List<Esame>, List<SlotGuida>, Set<String>, bool) onRisultato) async {
-    if (_utenteLoggato == null) return;
-    try {
-      final adesso = DateTime.now();
-      if (tab == 0) {
-        final esami = await repository.getEsamiFuturi(_utenteLoggato!.categoriaRichiesta, adesso);
-        final prenotati = await repository.getPrenotazioniEsamiUtente(_utenteLoggato!.codiceFiscale);
-        onRisultato(esami, [], prenotati.toSet(), false);
-      } else {
-        final guide = await repository.getGuideFuture(_utenteLoggato!.categoriaRichiesta, adesso);
-        final prenotati = guide.where((g) => g.utentePrenotato == _utenteLoggato!.codiceFiscale).map((g) => g.idGuida).toSet();
-        onRisultato([], guide, prenotati, false);
-      }
-    } catch (e) {
-      onRisultato([], [], {}, true);
-    }
-  }
-
-  //salva la prenotazione per un esame o una guida specifica dell'utente
-  Future<void> prenotaElemento(int tab, String id, Function(bool, String) onRisultato) async {
-    if (_utenteLoggato == null) return;
-    try {
-      if (tab == 0) {
-        await repository.prenotaEsame(id, _utenteLoggato!.codiceFiscale);
-      } else {
-        await repository.prenotaGuida(id, _utenteLoggato!.codiceFiscale);
-      }
-      onRisultato(true, "Prenotazione effettuata");
-    } catch (e) {
-      onRisultato(false, "Errore durante la prenotazione");
-    }
   }
 
   //procedura per cambiare la password verificando prima quella attualmente in uso

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../ui/theme/UtenteViewModel.dart';
+import '../viewModel/UtenteViewModel.dart';
+import '../viewModel/EsitiViewModel.dart';
 import '../model/EsitoEsame.dart';
 import '../model/Esame.dart';
 
@@ -29,13 +30,18 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
 
   //chiamata al ViewModel per recuperare lo storico degli esiti dell'utente
   Future<void> _caricaDati() async {
-    final viewModel = Provider.of<UtenteViewModel>(context, listen: false);
+    final utenteViewModel = Provider.of<UtenteViewModel>(context, listen: false);
+    final esitiViewModel = Provider.of<EsitiViewModel>(context, listen: false);
+    
+    final cf = utenteViewModel.utenteLoggato?.codiceFiscale;
+    if (cf == null) return;
+
     setState(() {
       _inCaricamento = true;
       _erroreCaricamento = false;
     });
 
-    await viewModel.caricaEsiti((esiti, dettagli, errore) {
+    await esitiViewModel.caricaEsiti(cf, (esiti, dettagli, errore) {
       if (mounted) {
         setState(() {
           _esiti = esiti;

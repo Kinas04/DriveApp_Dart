@@ -14,7 +14,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  // Lista delle schermate collegate alla barra di navigazione
+  //lista delle schermate collegate alla barra di navigazione
   static final List<Widget> _pages = <Widget>[
     const SchermataCalendario(),
     const SchermataEsiti(),
@@ -24,61 +24,132 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //determiniamo l'orientamento del dispositivo
+    final bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
     return Scaffold(
-      //Il corpo dello Scaffold varai in base all'"indice selezionato"
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              spreadRadius: 2,
-            ),
-          ],
-        ),
-        child: NavigationBarTheme(
-          data: NavigationBarThemeData(
-            indicatorColor: const Color(0xFFDEE1F3),
-            labelTextStyle: WidgetStateProperty.all(
-              const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-            ),
-          ),
-          child: NavigationBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: (int index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            //Settiamo le destinazioni per ogni bottone della navbar
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.calendar_today_outlined),
-                selectedIcon: Icon(Icons.calendar_today),
-                label: 'Calendario',
+      //aggiungiamo il drawer richiamabile con swipe o menu a tre linee
+      drawer: _buildDrawer(),
+      //il corpo dello Scaffold varia in base all'orientamento per evitare sovrapposizioni
+      body: isLandscape 
+        ? Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              //colonna fissa per il menu in orizzontale
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                  child: Builder(
+                    builder: (context) => IconButton(
+                      icon: const Icon(Icons.menu, size: 32),
+                      onPressed: () => Scaffold.of(context).openDrawer(),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.white.withValues(alpha: 0.8),
+                        elevation: 4,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-              NavigationDestination(
-                icon: Icon(Icons.assignment_outlined),
-                selectedIcon: Icon(Icons.assignment),
-                label: 'Esiti esami',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.add),
-                label: 'Prenota',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.account_circle_outlined),
-                selectedIcon: Icon(Icons.account_circle),
-                label: 'Account',
-              ),
+              //la pagina occupa il resto dello spazio
+              Expanded(child: _pages[_selectedIndex]),
             ],
-          ),
+          )
+        : _pages[_selectedIndex],
+      //mostriamo la navbar solo se il cellulare e' in verticale
+      bottomNavigationBar: isLandscape ? null : _buildBottomNav(),
+    );
+  }
+
+  //costruisce il menu laterale (drawer) rendendolo scrollabile per evitare overflow
+  Widget _buildDrawer() {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          const SizedBox(height: 40), //spazio sopra il menù
+          _buildDrawerItem(Icons.calendar_today, "Calendario", 0),
+          _buildDrawerItem(Icons.assignment, "Esiti", 1),
+          _buildDrawerItem(Icons.add, "Prenota", 2),
+          _buildDrawerItem(Icons.account_circle, "Account", 3),
+        ],
+      ),
+    );
+  }
+
+  //crea il singolo elemento del drawer
+  Widget _buildDrawerItem(IconData icon, String label, int index) {
+    bool isSelected = _selectedIndex == index;
+    return ListTile(
+      leading: Icon(icon, color: isSelected ? const Color(0xFFDEE1F3) : null),
+      title: Text(
+        label,
+        style: TextStyle(
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          color: isSelected ? Colors.blue : null,
         ),
       ),
+      selected: isSelected,
+      onTap: () {
+        setState(() => _selectedIndex = index);
+        Navigator.pop(context); //chiude il drawer dopo la selezione
+      },
+    );
+  }
+
+  //costruisce la barra di navigazione inferiore standard
+  Widget _buildBottomNav() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          indicatorColor: const Color(0xFFDEE1F3),
+          labelTextStyle: WidgetStateProperty.all(
+            const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          ),
+        ),
+        child: NavigationBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: (int index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          destinations: [
+            _buildDestination(Icons.calendar_today_outlined, Icons.calendar_today, 'Calendario', 0),
+            _buildDestination(Icons.assignment_outlined, Icons.assignment, 'Esiti', 1),
+            _buildDestination(Icons.add, Icons.add, 'Prenota', 2),
+            _buildDestination(Icons.account_circle_outlined, Icons.account_circle, 'Account', 3),
+          ],
+        ),
+      ),
+    );
+  }
+
+  //funzione per costruire la destinazione con l'effetto di sollevamento e ingrandimento
+  NavigationDestination _buildDestination(IconData icon, IconData selectedIcon, String label, int index) {
+    bool isSelected = _selectedIndex == index;
+    return NavigationDestination(
+      icon: Icon(icon),
+      selectedIcon: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutBack,
+        transform: Matrix4.translationValues(0, isSelected ? -8 : 0, 0),
+        child: Icon(selectedIcon),
+      ),
+      label: label,
     );
   }
 }
