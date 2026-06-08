@@ -28,9 +28,9 @@ class _MainScreenState extends State<MainScreen> {
     final bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
     return Scaffold(
-      //aggiungiamo il drawer richiamabile con swipe o menu a tre linee
+      //aggiungiamo il drawer (pannello laterale) richiamabile menu a tre linee
       drawer: _buildDrawer(),
-      //il corpo dello Scaffold varia in base all'orientamento per evitare sovrapposizioni
+      //il corpo dello Scaffold varia in base all'orientamento
       body: isLandscape 
         ? Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,6 +42,7 @@ class _MainScreenState extends State<MainScreen> {
                   child: Builder(
                     builder: (context) => IconButton(
                       icon: const Icon(Icons.menu, size: 32),
+                      //alla pressione del menù a tre linee, si apre il pannello con tutte le schermate
                       onPressed: () => Scaffold.of(context).openDrawer(),
                       style: IconButton.styleFrom(
                         backgroundColor: Colors.white.withValues(alpha: 0.8),
@@ -61,7 +62,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  //costruisce il menu laterale (drawer) rendendolo scrollabile per evitare overflow
+  //costruisce il menu laterale rendendolo scrollabile per evitare overflow (problema con i pixel)
   Widget _buildDrawer() {
     return Drawer(
       child: ListView(
@@ -97,7 +98,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  //costruisce la barra di navigazione inferiore standard
+  //costruisce la barra di navigazione sul fondo dello schermo
   Widget _buildBottomNav() {
     return Container(
       decoration: BoxDecoration(
@@ -128,6 +129,7 @@ class _MainScreenState extends State<MainScreen> {
           },
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           destinations: [
+            //Assegno le varie icone per ogni schermata
             _buildDestination(Icons.calendar_today_outlined, Icons.calendar_today, 'Calendario', 0),
             _buildDestination(Icons.assignment_outlined, Icons.assignment, 'Esiti', 1),
             _buildDestination(Icons.add, Icons.add, 'Prenota', 2),
@@ -138,11 +140,14 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  //funzione per costruire la destinazione con l'effetto di sollevamento e ingrandimento
+  /*funzione per costruire la destinazione con l'effetto di sollevamento e ingrandimento
+  Utile per dare l'effetto simil - Kotlin*/
   NavigationDestination _buildDestination(IconData icon, IconData selectedIcon, String label, int index) {
     bool isSelected = _selectedIndex == index;
     return NavigationDestination(
       icon: Icon(icon),
+      //In base all'icona selezionata, chiamo al funzione AnimatedContainer
+      //Setto la durata dell'animazione, il tipo di effetto e di quanto deve spostarsi
       selectedIcon: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOutBack,

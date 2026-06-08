@@ -18,7 +18,7 @@ class EsitoEsame {
   ) {
     final data = snapshot.data();
     return EsitoEsame(
-      snapshot.id,
+      data?['idEsame'] ?? '',
       data?['codiceFiscale'] ?? '',
       data?['esito'] ?? '',
     );
@@ -26,6 +26,7 @@ class EsitoEsame {
 
   Map<String, dynamic> toFirestore() {
     return {
+      "idEsame": idEsame,
       "codiceFiscale": codiceFiscale,
       "esito": esito,
     };

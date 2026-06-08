@@ -47,6 +47,7 @@ class _SchermataLoginState extends State<SchermataLogin> {
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<UtenteViewModel>(context);
+    //Adatto la larghezza della schermata login in base alla larghezza dello schermo attualmente in uso
     final double larghezzaSchermo = MediaQuery.of(context).size.width;
     final bool isCompatto = larghezzaSchermo < 600;
 
@@ -112,6 +113,7 @@ class _SchermataLoginState extends State<SchermataLogin> {
             color: Colors.blue.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
+          //Anche qua logo di default
           child: const Icon(Icons.directions_car, size: 120, color: Colors.blue),
         ),
         const SizedBox(height: 32),

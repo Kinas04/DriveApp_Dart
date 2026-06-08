@@ -17,8 +17,11 @@ class CalendarioViewModel extends ChangeNotifier {
   ) async {
     try {
       final inizio = DateTime(data.year, data.month, data.day);
+      //Arrivo con add e Duration alla mezzanotte del giorno successivo
+      //es da 4 giugno 00:00 a 5 giugno 00:00
       final fine = inizio.add(const Duration(days: 1));
-      
+
+      //Prelevo le info necessarie dai vari getter
       if (tab == 0) {
         final lezioni = await repository.getLezioni(inizio, fine);
         onRisultato(lezioni, [], [], false);
@@ -30,6 +33,7 @@ class CalendarioViewModel extends ChangeNotifier {
         onRisultato([], [], guide, false);
       }
     } catch (e) {
+      //restituisco nulla se false
       onRisultato([], [], [], true);
     }
   }

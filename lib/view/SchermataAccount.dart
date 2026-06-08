@@ -31,6 +31,7 @@ class SchermataAccount extends StatelessWidget {
                   children: [
                     const CircleAvatar(
                       radius: 50,
+                      //Qua uso l'icona standard di sistema per la foto profilo
                       child: Icon(Icons.person, size: 50),
                     ),
                     const SizedBox(height: 20),
@@ -91,24 +92,26 @@ class SchermataAccount extends StatelessWidget {
     );
   }
 
-  //mostra un dialog personalizzato con i crediti del progetto
+  //funzione che mostra un banner personalizzato con i crediti del progetto
   void _mostraInfoApp(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Informazioni sull'app"),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Drive App", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            Text("Versione 1.0.0"),
-            SizedBox(height: 16),
-            Text("Programmazione Mobile A.A 2025/2026", style: TextStyle(fontWeight: FontWeight.w500)),
-            Text("Gonzato Cristian, De Cinque Nicola Giorgio"),
-            SizedBox(height: 16),
-            Text("© 2026 Drive App Team"),
-          ],
+        content: const SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Drive App", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              Text("Versione 1.0.0"),
+              SizedBox(height: 16),
+              Text("Programmazione Mobile A.A 2025/2026", style: TextStyle(fontWeight: FontWeight.w500)),
+              Text("Gonzato Cristian, De Cinque Nicola Giorgio"),
+              SizedBox(height: 16),
+              Text("© 2026 Drive App Team"),
+            ],
+          ),
         ),
         actions: [
           TextButton(

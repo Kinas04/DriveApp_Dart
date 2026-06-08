@@ -35,6 +35,7 @@ class PrenotaViewModel extends ChangeNotifier {
   Future<void> prenotaElemento(int tab, String id, String cf, Function(bool, String) onRisultato) async {
     try {
       if (tab == 0) {
+        //Chiamo le funzioni prenotaEsame e prenotaGuida dalla repository per applicare il salvataggio
         await repository.prenotaEsame(id, cf);
       } else {
         await repository.prenotaGuida(id, cf);

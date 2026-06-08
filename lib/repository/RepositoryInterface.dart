@@ -4,6 +4,7 @@ import '../model/Esame.dart';
 import '../model/SlotGuida.dart';
 import '../model/EsitoEsame.dart';
 
+//Interfaccia con una serie di funzioni per vari usi nel progetto
 abstract class RepositoryInterface {
   Future<Utente?> eseguiLogin(String codiceFiscale, String password);
   

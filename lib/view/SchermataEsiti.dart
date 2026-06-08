@@ -28,7 +28,8 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
     });
   }
 
-  //chiamata al ViewModel per recuperare lo storico degli esiti dell'utente
+  /*chiamata al ViewModel per recuperare lo storico degli esiti dell'utente
+  Logica simile al calendario*/
   Future<void> _caricaDati() async {
     final utenteViewModel = Provider.of<UtenteViewModel>(context, listen: false);
     final esitiViewModel = Provider.of<EsitiViewModel>(context, listen: false);
@@ -118,12 +119,52 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
           context,
           isPromosso: isPromosso,
           titolo: esito.esito.toUpperCase(),
-          esame: esame != null ? "Esame di ${esame.tipologia}" : "Esame sconosciuto",
-          patente: esame != null ? "patente ${esame.categoriaPatente}" : "",
+          esame: esame != null ? "Esame ${esame.tipologia}" : "Esame sconosciuto",
+          patente: esame != null ? "Patente ${esame.categoriaPatente}" : "",
           dataLuogo: stringaDataLuogo,
           color: isPromosso ? const Color(0xFFDEE1F3) : const Color(0xFFF9F1F7),
+          onVedi: () {
+            if (esame != null) {
+              _mostraDettagliEsame(context, esito, esame);
+            }
+          },
         );
       },
+    );
+  }
+
+  //mostra un dialog con i dettagli completi dell'esame e dell'esito
+  void _mostraDettagliEsame(BuildContext context, EsitoEsame esito, Esame esame) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Dettaglio Esame ${esame.tipologia}"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Categoria: Patente ${esame.categoriaPatente}"),
+            Text("Data: ${DateFormat('dd/MM/yyyy').format(esame.data)}"),
+            Text("Orario: ${esame.oraInizio} - ${esame.oraFine}"),
+            Text("Luogo: ${esame.luogo}"),
+            const Divider(height: 24),
+            Text(
+              "ESITO: ${esito.esito.toUpperCase()}",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: (esito.esito.toLowerCase() == "idoneo" || esito.esito.toLowerCase() == "promosso") 
+                    ? Colors.green : Colors.red,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("CHIUDI"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -136,6 +177,7 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
     required String patente,
     required String dataLuogo,
     required Color color,
+    required VoidCallback onVedi,
   }) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -166,14 +208,6 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  esame,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
                 if (patente.isNotEmpty)
                   Text(
                     patente,
@@ -183,6 +217,15 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
                       color: Colors.black87,
                     ),
                   ),
+                const SizedBox(height: 4),
+                Text(
+                  esame,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black87,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Text(
                   dataLuogo,
@@ -196,11 +239,7 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
           ),
           //pulsante per aprire i dettagli dell'esito
           InkWell(
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Dettaglio esame in arrivo...")),
-              );
-            },
+            onTap: onVedi,
             child: const Row(
               children: [
                 Text(

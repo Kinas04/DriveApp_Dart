@@ -3,6 +3,7 @@ import 'ConnectivityChecker.dart';
 
 class ConnectivityCheckerImpl implements ConnectivityChecker {
   @override
+  //Richiamo qui l'interfaccia e verifico effettivamente la connessione
   Future<bool> isInternetAvailable() async {
     final List<ConnectivityResult> connectivityResult =
         await Connectivity().checkConnectivity();

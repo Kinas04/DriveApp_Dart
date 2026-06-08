@@ -82,17 +82,18 @@ class UtenteViewModel extends ChangeNotifier {
     required String cognome,
     required String cf,
     required String password,
-    required String etaString,
+    required String eta,
     required String categoria,
     required Function(bool, String) onRisultato,
   }) async {
-    if (nome.isEmpty || cognome.isEmpty || etaString.isEmpty || cf.isEmpty || password.isEmpty || categoria.isEmpty) {
+    if (nome.isEmpty || cognome.isEmpty || eta.isEmpty || cf.isEmpty || password.isEmpty || categoria.isEmpty) {
       onRisultato(false, "Compila tutti i campi");
       return;
     }
 
-    final validation = validaDatiRegistrazione(nome, cognome, cf, password, etaString, categoria);
-    if (!validation.item1) {
+    final validation = validaDatiRegistrazione(nome, cognome, cf, password, eta, categoria);
+    if (!validation.item1) { //è boolean, quini se non true
+      //Invio alla UI il segnale di fail e il motivo grazie a item2 (String)
       onRisultato(false, validation.item2);
       return;
     }
@@ -100,12 +101,13 @@ class UtenteViewModel extends ChangeNotifier {
     final nuovoUtente = Utente(
       nome.trim(),
       cognome.trim(),
-      int.tryParse(etaString) ?? 0,
+      int.tryParse(eta) ?? 0,
       cf.trim().toUpperCase(),
       password,
       categoria,
     );
 
+    //Chiamo la funzione registraUtente dal repository per salvare la registrazione su Firebase
     try {
       await repository.registraUtente(nuovoUtente, password);
       _utenteLoggato = nuovoUtente;
@@ -181,24 +183,24 @@ class UtenteViewModel extends ChangeNotifier {
   }
 
   //effettua la validazione dei dati inseriti in fase di registrazione iniziale
-  Tuple2<bool, String> validaDatiRegistrazione(
+  Oggetti2<bool, String> validaDatiRegistrazione(
     String nome,
     String cognome,
     String cf,
     String password,
-    String etaString,
+    String eta,
     String categoria,
   ) {
     final regexNomeCognome = RegExp(r"^[a-zA-ZÀ-ÿ\s']+$");
-    if (!regexNomeCognome.hasMatch(nome)) return const Tuple2(false, "Nome non valido");
-    if (!regexNomeCognome.hasMatch(cognome)) return const Tuple2(false, "Cognome non valido");
+    if (!regexNomeCognome.hasMatch(nome)) return const Oggetti2(false, "Nome non valido");
+    if (!regexNomeCognome.hasMatch(cognome)) return const Oggetti2(false, "Cognome non valido");
 
     final regexCF = RegExp(r"^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$");
-    if (!regexCF.hasMatch(cf.toUpperCase())) return const Tuple2(false, "Codice Fiscale non valido");
+    if (!regexCF.hasMatch(cf.toUpperCase())) return const Oggetti2(false, "Codice Fiscale non valido");
 
-    if (password.length < 6) return const Tuple2(false, "Password troppo corta (min 6)");
+    if (password.length < 6) return const Oggetti2(false, "Password troppo corta (min 6)");
 
-    final eta = int.tryParse(etaString) ?? 0;
+    final etaVal = int.tryParse(eta) ?? 0;
     int etaMinima = 18;
     //utilizzo uno switch case per includere tutte le categorie di patente ministeriali
     switch (categoria) {
@@ -209,14 +211,14 @@ class UtenteViewModel extends ChangeNotifier {
       case "A": case "D": case "DE": etaMinima = 24; break;
     }
 
-    if (eta < etaMinima) return Tuple2(false, "Età minima per $categoria è $etaMinima");
+    if (etaVal < etaMinima) return Oggetti2(false, "Età minima per $categoria è $etaMinima");
 
-    return const Tuple2(true, "");
+    return const Oggetti2(true, "");
   }
 }
 
-class Tuple2<T1, T2> {
+class Oggetti2<T1, T2> {
   final T1 item1;
   final T2 item2;
-  const Tuple2(this.item1, this.item2);
+  const Oggetti2(this.item1, this.item2);
 }

@@ -39,7 +39,7 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
       cognome: cognomeController.text.trim(),
       cf: codiceController.text.trim(),
       password: passwordController.text.trim(),
-      etaString: etaSelezionata ?? "",
+      eta: etaSelezionata ?? "",
       categoria: categoriaSelezionata ?? "",
       onRisultato: (successo, messaggio) {
         if (mounted) {

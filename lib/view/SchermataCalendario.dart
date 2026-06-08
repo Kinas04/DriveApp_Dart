@@ -17,6 +17,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
   int _tabSelezionato = 0;
   DateTime _dataSelezionata = DateTime.now();
 
+  //Inzializzo le tre liste necessarie a vuoote
   List<Lezione> _lezioni = [];
   List<Esame> _esami = [];
   List<SlotGuida> _guide = [];
@@ -27,7 +28,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
   @override
   void initState() {
     super.initState();
-    //caricamento iniziale post-frame per avere il contesto pronto ed evitare errori di build
+    //caricamento iniziale post-frame (dopo che arrivo sulla schermata) per avere il contesto pronto ed evitare errori di build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _caricaEventi();
     });
@@ -48,6 +49,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
       (lezioni, esami, guide, errore) {
         if (mounted) {
           setState(() {
+            //Carico ora le liste con le varie lezioni
             _lezioni = lezioni;
             _esami = esami;
             _guide = guide;
@@ -184,7 +186,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
     );
   }
 
-  //widget del calendario nativo per selezionare il giorno desiderato
+  //widget del calendario per selezionare il giorno desiderato
   Widget _buildCalendario() {
     return Card(
       elevation: 2,
@@ -225,7 +227,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
       );
     }
 
-    //utilizzo uno switch case per gestire le categorie di eventi
+    //associo gli elementi corretti alla lista corretta in base al tab selezionato
     final List items = _tabSelezionato == 0 ? _lezioni : (_tabSelezionato == 1 ? _esami : _guide);
 
     if (items.isEmpty) {
