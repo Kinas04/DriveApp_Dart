@@ -8,7 +8,8 @@ class SchermataAccount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //otteniamo l'istanza del ViewModel per accedere ai dati dell'utente loggato
+    /*otteniamo l'istanza del ViewModel per accedere ai dati dell'utente loggato
+    Fondamentale ogni volta è passare il contesto!!*/
     final viewModel = Provider.of<UtenteViewModel>(context);
     final utente = viewModel.utenteLoggato;
 
@@ -52,7 +53,7 @@ class SchermataAccount extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               const Divider(height: 1),
-              //collega alla schermata per la gestione della password e cancellazione account
+              //collega la schermata per la gestione della password e cancellazione account
               ListTile(
                 title: const Text("Sicurezza ed accesso", style: TextStyle(fontWeight: FontWeight.w500)),
                 subtitle: const Text("Modifica password, elimina account"),

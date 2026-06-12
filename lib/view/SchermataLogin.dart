@@ -28,6 +28,7 @@ class _SchermataLoginState extends State<SchermataLogin> {
       codiceController.text.trim(),
       passwordController.text.trim(),
       (successo, messaggio) {
+        //Verifico che la schermata sia ancora attiva prima di aggiornare lo stato
         if (mounted) {
           setState(() {
             inCaricamento = false;

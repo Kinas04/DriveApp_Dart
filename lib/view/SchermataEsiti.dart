@@ -43,6 +43,7 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
     });
 
     await esitiViewModel.caricaEsiti(cf, (esiti, dettagli, errore) {
+      //Verifico che l'utente non abbia lasciato la pagina durante il caricamento dei dati
       if (mounted) {
         setState(() {
           _esiti = esiti;
@@ -139,24 +140,27 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text("Dettaglio Esame ${esame.tipologia}"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Categoria: Patente ${esame.categoriaPatente}"),
-            Text("Data: ${DateFormat('dd/MM/yyyy').format(esame.data)}"),
-            Text("Orario: ${esame.oraInizio} - ${esame.oraFine}"),
-            Text("Luogo: ${esame.luogo}"),
-            const Divider(height: 24),
-            Text(
-              "ESITO: ${esito.esito.toUpperCase()}",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: (esito.esito.toLowerCase() == "idoneo" || esito.esito.toLowerCase() == "promosso") 
-                    ? Colors.green : Colors.red,
+        //Uso SingleChildScrollView per evitare overflow in modalità landscape
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Categoria: Patente ${esame.categoriaPatente}"),
+              Text("Data: ${DateFormat('dd/MM/yyyy').format(esame.data)}"),
+              Text("Orario: ${esame.oraInizio} - ${esame.oraFine}"),
+              Text("Luogo: ${esame.luogo}"),
+              const Divider(height: 24),
+              Text(
+                "ESITO: ${esito.esito.toUpperCase()}",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: (esito.esito.toLowerCase() == "idoneo" || esito.esito.toLowerCase() == "promosso")
+                      ? Colors.green : Colors.red,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           TextButton(

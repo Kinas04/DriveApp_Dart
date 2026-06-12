@@ -32,6 +32,10 @@ abstract class RepositoryInterface {
 
   Future<void> prenotaGuida(String idGuida, String codiceFiscale);
 
+  Future<void> annullaEsame(String idEsame, String codiceFiscale);
+
+  Future<void> annullaGuida(String idGuida);
+
   Future<void> cambiaPassword(String nuovaPassword);
 
   Future<void> eliminaUtente(String codiceFiscale);

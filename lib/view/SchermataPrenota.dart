@@ -16,9 +16,11 @@ class SchermataPrenota extends StatefulWidget {
 
 class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProviderStateMixin {
   late TabController _tabController;
-  
+
+  //Inzializzo lo stato delle liste per esami e guide
   List<Esame> _listaEsami = [];
   List<SlotGuida> _listaGuide = [];
+  //è un insieme di ID, ovvero tiene conto di quelli già effettivamente prenotati
   Set<String> _elementiPrenotati = {};
   
   bool _inCaricamento = true;
@@ -31,6 +33,7 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
     //inizializziamo il TabController per gestire i due tab della schermata
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
+      //Se "permango" su tab, ovvero se non cambio, carico il contenuto
       if (!_tabController.indexIsChanging) {
         _caricaDati();
       }
@@ -49,12 +52,16 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
 
   //chiamata al ViewModel per caricare le liste degli elementi prenotabili dal database
   Future<void> _caricaDati() async {
+    //Prendo i contesti dai viewModel di utente e prenota
     final utenteViewModel = Provider.of<UtenteViewModel>(context, listen: false);
     final prenotaViewModel = Provider.of<PrenotaViewModel>(context, listen: false);
 
+    //Inizializzo una variabile "utente" a utenteloggato
     final utente = utenteViewModel.utenteLoggato;
+    //Se non c'è, esco
     if (utente == null) return;
-    
+
+    //Inizializzo gli stati di caricamento e errore
     setState(() {
       _inCaricamento = true;
       _erroreCaricamento = false;
@@ -65,12 +72,14 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
       utente.codiceFiscale,
       _tabController.index,
       (esami, guide, prenotati, errore) {
+        //controllo se l'utente è ancora in questa schermata prima di mostrare i dati caricati
         if (mounted) {
           setState(() {
             _listaEsami = esami;
             _listaGuide = guide;
             _elementiPrenotati = prenotati;
             _erroreCaricamento = errore;
+            //Quando finisco di caricare, blocco con false
             _inCaricamento = false;
           });
         }
@@ -89,16 +98,20 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
             title: const Text("Conferma Prenotazione"),
             content: const Text("Vuoi confermare la prenotazione per questo elemento?"),
             actions: [
+              //Se premo annulla sul banner, faccio pop del contesto
               TextButton(
                 onPressed: _inPrenotazione ? null : () => Navigator.pop(context),
                 child: const Text("ANNULLA"),
               ),
               TextButton(
                 onPressed: _inPrenotazione ? null : () async {
+                  //Se invece premo CONFERMA, setto a true la prenotazione
                   setDialogState(() => _inPrenotazione = true);
+                  //Passo i vari contesti dei viewmodel della prenotazione e utente
                   final utenteViewModel = Provider.of<UtenteViewModel>(context, listen: false);
                   final prenotaViewModel = Provider.of<PrenotaViewModel>(context, listen: false);
-                  
+
+                  //Associo il cf
                   final cf = utenteViewModel.utenteLoggato?.codiceFiscale;
                   if (cf == null) return;
 
@@ -107,6 +120,7 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
                     id,
                     cf,
                     (successo, messaggio) {
+                      //evito errori se l'utente chiude il popup o cambia pagina durante la prenotazione
                       if (mounted) {
                         setDialogState(() => _inPrenotazione = false);
                         Navigator.pop(context);
@@ -123,6 +137,60 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
                 child: _inPrenotazione 
                     ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) 
                     : const Text("CONFERMA"),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  //mostra un popup di avviso per chiedere conferma all'utente prima di annullare una prenotazione
+  void _mostraPopupAnnulla(String id) {
+    showDialog(
+      context: context,
+      barrierDismissible: !_inPrenotazione,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            title: const Text("Annulla Prenotazione"),
+            content: const Text("Vuoi davvero annullare la prenotazione?"),
+            actions: [
+              TextButton(
+                onPressed: _inPrenotazione ? null : () => Navigator.pop(context),
+                child: const Text("NO"),
+              ),
+              TextButton(
+                onPressed: _inPrenotazione ? null : () async {
+                  setDialogState(() => _inPrenotazione = true);
+                  final utenteViewModel = Provider.of<UtenteViewModel>(context, listen: false);
+                  final prenotaViewModel = Provider.of<PrenotaViewModel>(context, listen: false);
+
+                  final cf = utenteViewModel.utenteLoggato?.codiceFiscale;
+                  if (cf == null) return;
+
+                  await prenotaViewModel.annullaPrenotazione(
+                    _tabController.index,
+                    id,
+                    cf,
+                    (successo, messaggio) {
+                      //evito errori se l'utente chiude il popup o cambia pagina durante la prenotazione
+                      if (mounted) {
+                        setDialogState(() => _inPrenotazione = false);
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(messaggio)),
+                        );
+                        if (successo) {
+                          _caricaDati();
+                        }
+                      }
+                    },
+                  );
+                },
+                child: _inPrenotazione
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Text("SÌ, ANNULLA"),
               ),
             ],
           );
@@ -276,11 +344,15 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
     required bool isPrenotato,
   }) {
     final formatData = DateFormat('EEE d MMM', 'it_IT');
+    //Se la prenotazione va a buon fine, la riga diventa verde e diventa non prenotabile una seconda volta
     final Color colorePrincipale = isPrenotato ? Colors.green : Colors.black;
     final IconData iconaStato = isPrenotato ? Icons.check : Icons.access_time;
 
+    //Sostanzialmente, questa funzione mostra l'effetto onda al tocco
     return InkWell(
-      onTap: isPrenotato ? null : () => _mostraPopupConferma(id),
+      /*Se l'elemento non è ancora prenotato, apre il popup di conferma.
+      Se è già prenotato, apre il popup per permetterne l'annullamento*/
+      onTap: () => isPrenotato ? _mostraPopupAnnulla(id) : _mostraPopupConferma(id),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12.0),
         child: Row(

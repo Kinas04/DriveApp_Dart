@@ -45,4 +45,18 @@ class PrenotaViewModel extends ChangeNotifier {
       onRisultato(false, "Errore durante la prenotazione");
     }
   }
+
+  //annulla la prenotazione per un esame o una guida specifica dell'utente
+  Future<void> annullaPrenotazione(int tab, String id, String cf, Function(bool, String) onRisultato) async {
+    try {
+      if (tab == 0) {
+        await repository.annullaEsame(id, cf);
+      } else {
+        await repository.annullaGuida(id);
+      }
+      onRisultato(true, "Prenotazione annullata");
+    } catch (e) {
+      onRisultato(false, "Errore durante l'annullamento");
+    }
+  }
 }

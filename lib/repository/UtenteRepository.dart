@@ -162,6 +162,20 @@ class UtenteRepository implements RepositoryInterface {
     });
   }
 
+  //Rimuove la prenotazione dell'esame dal database per l'utente specifico
+  @override
+  Future<void> annullaEsame(String idEsame, String codiceFiscale) async {
+    await firestore.collection("prenotazioni_esami").doc("${idEsame}_$codiceFiscale").delete();
+  }
+
+  //Annulla la prenotazione della guida liberando lo slot (imposta l'utente a null)
+  @override
+  Future<void> annullaGuida(String idGuida) async {
+    await firestore.collection("slot_guide").doc(idGuida).update({
+      "utentePrenotato": null,
+    });
+  }
+
   @override
   Future<void> cambiaPassword(String nuovaPassword) async {
     await auth.currentUser?.updatePassword(nuovaPassword);
