@@ -55,7 +55,13 @@ class _SchermataLoginState extends State<SchermataLogin> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
-        child: isCompatto ? _buildLayoutCompatto(viewModel) : _buildLayoutTablet(viewModel),
+        // il center bilancia i contenuti visualizzati
+        child: Center(
+          // preveniamo overflow
+          child: SingleChildScrollView(
+            child: isCompatto ? _buildLayoutCompatto(viewModel) : _buildLayoutTablet(viewModel),
+          ),
+        ),
       ),
     );
   }
@@ -102,24 +108,31 @@ class _SchermataLoginState extends State<SchermataLogin> {
     return Column(
       children: [
         const Text(
-          "Bentornato!",
+          "Ti diamo il benvenuto su DriveAPP!",
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
         Container(
-          width: 236,
-          height: 236,
-          decoration: BoxDecoration(
-            color: Colors.blue.withValues(alpha: 0.1),
+          width: 200,
+          height: 200,
+          decoration: const BoxDecoration(
+            color: Colors.white,
             shape: BoxShape.circle,
           ),
-          //Anche qua logo di default
-          child: const Icon(Icons.directions_car, size: 120, color: Colors.blue),
+          // Logo app centrale
+          child: Center(
+            child: Image.asset(
+              'assets/images/logo_circle.webp',
+              width: 160,
+              height: 160,
+              fit: BoxFit.contain, // proporzioni originali
+            ),
+          ),
         ),
         const SizedBox(height: 32),
         const Text(
-          "Accedi per gestire le tue guide e i tuoi esami",
+          "Effettua l'accesso:",
           style: TextStyle(fontSize: 14, color: Colors.black54),
           textAlign: TextAlign.center,
         ),

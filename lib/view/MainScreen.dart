@@ -82,15 +82,15 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildDrawerItem(IconData icon, String label, int index) {
     bool isSelected = _selectedIndex == index;
     return ListTile(
-      leading: Icon(icon, color: isSelected ? const Color(0xFFDEE1F3) : null),
+      leading: Icon(icon),
       title: Text(
         label,
         style: TextStyle(
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected ? Colors.blue : null,
         ),
       ),
       selected: isSelected,
+      selectedColor: Colors.blue, // colore quando selezionati
       onTap: () {
         setState(() => _selectedIndex = index);
         Navigator.pop(context); //chiude il drawer dopo la selezione
@@ -143,7 +143,6 @@ class _MainScreenState extends State<MainScreen> {
   /*funzione per costruire la destinazione con l'effetto di sollevamento e ingrandimento
   Utile per dare l'effetto simil - Kotlin*/
   NavigationDestination _buildDestination(IconData icon, IconData selectedIcon, String label, int index) {
-    bool isSelected = _selectedIndex == index;
     return NavigationDestination(
       icon: Icon(icon),
       //In base all'icona selezionata, chiamo al funzione AnimatedContainer
@@ -151,7 +150,6 @@ class _MainScreenState extends State<MainScreen> {
       selectedIcon: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOutBack,
-        transform: Matrix4.translationValues(0, isSelected ? -8 : 0, 0),
         child: Icon(selectedIcon),
       ),
       label: label,
