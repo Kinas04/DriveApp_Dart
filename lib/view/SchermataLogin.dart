@@ -147,7 +147,11 @@ class _SchermataLoginState extends State<SchermataLogin> {
         TextField(
           controller: codiceController,
           onChanged: (v) {
-            codiceController.text = viewModel.formattaCodiceFiscale(v);
+            String testoFormattato = viewModel.formattaCodiceFiscale(v);
+            codiceController.value = TextEditingValue(
+              text: testoFormattato,
+              selection: TextSelection.collapsed(offset: testoFormattato.length),
+            );
             setState(() => messaggioErrore = "");
           },
           decoration: InputDecoration(

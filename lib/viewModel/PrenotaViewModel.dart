@@ -22,9 +22,15 @@ class PrenotaViewModel extends ChangeNotifier {
         final prenotati = await repository.getPrenotazioniEsamiUtente(cf);
         onRisultato(esami, [], prenotati.toSet(), false);
       } else {
-        final guide = await repository.getGuideFuture(categoria, adesso);
-        final prenotati = guide.where((g) => g.utentePrenotato == cf).map((g) => g.idGuida).toSet();
-        onRisultato([], guide, prenotati, false);
+        final tutteLeGuide = await repository.getGuideFuture(categoria, adesso);
+        final guideVisibili = tutteLeGuide.where((g) =>
+        g.utentePrenotato == null || g.utentePrenotato == cf
+        ).toList();
+        final prenotati = guideVisibili
+            .where((g) => g.utentePrenotato == cf)
+            .map((g) => g.idGuida)
+            .toSet();
+        onRisultato([], guideVisibili, prenotati, false);
       }
     } catch (e) {
       onRisultato([], [], {}, true);

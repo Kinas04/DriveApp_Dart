@@ -6,7 +6,6 @@ class Utente {
   String cognome;
   int eta;
   String codiceFiscale;
-  String password;
   String categoriaRichiesta;
 
   Utente(
@@ -14,7 +13,6 @@ class Utente {
     this.cognome,
     this.eta,
     this.codiceFiscale,
-    this.password,
     this.categoriaRichiesta,
   );
 
@@ -28,7 +26,6 @@ class Utente {
       data?['cognome'] ?? '',
       data?['eta'] ?? 0,
       data?['codiceFiscale'] ?? '',
-      data?['password'] ?? '',
       data?['categoriaRichiesta'] ?? '',
     );
   }
@@ -39,7 +36,6 @@ class Utente {
       "cognome": cognome,
       "eta": eta,
       "codiceFiscale": codiceFiscale,
-      "password": password,
       "categoriaRichiesta": categoriaRichiesta,
     };
   }
