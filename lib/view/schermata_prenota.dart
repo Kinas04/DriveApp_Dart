@@ -220,19 +220,27 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
         child: Center(
           child: Container(
             constraints: const BoxConstraints(maxWidth: 400),
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 24),
                 _buildTitolo(isCompatto),
-                const SizedBox(height: 16),
-                _buildSelettoreTabs(),
-                const SizedBox(height: 16),
-                _buildSottotitolo(),
-                const SizedBox(height: 16),
-                //L'area del contenuto è espandibile per occupare tutto lo spazio verticale utile
-                Expanded(child: _buildContenuto()),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 16),
+                        _buildSelettoreTabs(),
+                        const SizedBox(height: 16),
+                        _buildSottotitolo(),
+                        const SizedBox(height: 16),
+                        //L'area del contenuto è espandibile per occupare tutto lo spazio verticale utile
+                        Expanded(child: _buildContenuto()),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -241,20 +249,23 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
     );
   }
 
-  //settiamo il titolo della pagina e gestiamo l'icona menu per la navigazione su tablet
+  //settiamo il titolo della pagina con un padding standard per l'allineamento globale
   Widget _buildTitolo(bool isCompatto) {
-    return Row(
-      children: [
-        if (!isCompatto && widget.onMenuClick != null)
-          IconButton(
-            onPressed: widget.onMenuClick,
-            icon: const Icon(Icons.menu),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+      child: Row(
+        children: [
+          if (!isCompatto && widget.onMenuClick != null)
+            IconButton(
+              onPressed: widget.onMenuClick,
+              icon: const Icon(Icons.menu),
+            ),
+          const Text(
+            "Prenota",
+            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
           ),
-        const Text(
-          "Prenota",
-          style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

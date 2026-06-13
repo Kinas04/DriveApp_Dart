@@ -91,7 +91,8 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 32),
+                  //Allineamento altezza titolo coerente con il resto del progetto
+                  const SizedBox(height: 24),
                   const Text(
                     "Crea un account",
                     style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),

@@ -87,7 +87,8 @@ class _SchermataLoginState extends State<SchermataLogin> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(height: 32),
+          //Padding superiore ridotto per allineare l'intestazione alle altre schermate
+          const SizedBox(height: 24),
           _buildIntestazione(),
           const SizedBox(height: 32),
           _buildModuloLogin(viewModel),

@@ -78,57 +78,23 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
   //layout verticale a colonna singola per smartphone
   Widget _buildLayoutCompatto() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTitolo(),
-          const SizedBox(height: 24),
-          _buildSelettoreTabs(),
-          const SizedBox(height: 24),
-          _buildCalendario(),
-          const SizedBox(height: 24),
-          _buildLabelData(),
-          const SizedBox(height: 16),
-          _buildListaEventi(),
-        ],
-      ),
-    );
-  }
-
-  //layout a due colonne ottimizzato per tablet: calendario a sinistra e lista eventi a destra
-  Widget _buildLayoutTablet() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          //Colonna dedicata alla selezione della data
-          Expanded(
-            flex: 12,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildTitolo(),
-                  const SizedBox(height: 24),
-                  _buildCalendario(),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(width: 32),
-          //Colonna dedicata alla visualizzazione dei dettagli degli eventi
-          Expanded(
-            flex: 10,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 24),
                 _buildSelettoreTabs(),
+                const SizedBox(height: 24),
+                _buildCalendario(),
                 const SizedBox(height: 24),
                 _buildLabelData(),
                 const SizedBox(height: 16),
-                Expanded(child: _buildListaEventi()),
+                _buildListaEventi(),
               ],
             ),
           ),
@@ -137,10 +103,61 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
     );
   }
 
+  //layout a due colonne ottimizzato per tablet: calendario a sinistra e lista eventi a destra
+  Widget _buildLayoutTablet() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        //Colonna dedicata alla selezione della data
+        Expanded(
+          flex: 12,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTitolo(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 24),
+                      _buildCalendario(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: 32),
+        //Colonna dedicata alla visualizzazione dei dettagli degli eventi
+        Expanded(
+          flex: 10,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 24),
+              _buildSelettoreTabs(),
+              const SizedBox(height: 24),
+              _buildLabelData(),
+              const SizedBox(height: 16),
+              Expanded(child: _buildListaEventi()),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildTitolo() {
-    return const Text(
-      "Calendario",
-      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+    //Applichiamo un padding standard per allineare il titolo a tutte le altre schermate
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(16, 24, 16, 16),
+      child: Text(
+        "Calendario",
+        style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+      ),
     );
   }
 
