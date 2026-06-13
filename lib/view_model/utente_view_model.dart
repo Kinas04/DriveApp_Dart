@@ -4,6 +4,7 @@ import '../repository/repository_interface.dart';
 import '../repository/connectivity_checker.dart';
 import '../data/preferences_repository.dart';
 
+//ViewModel che gestisce lo stato dell'utente, l'autenticazione e la persistenza dei dati
 class UtenteViewModel extends ChangeNotifier {
   //richiamo dalla repository le interfacce e il check per la connessione
   final RepositoryInterface repository;
@@ -33,12 +34,14 @@ class UtenteViewModel extends ChangeNotifier {
   //blocco eseguito automaticamente al lancio per recuperare l'utente loggato e gestire la persistenza offline
   Future<void> _inizializza() async {
     final cfSalvato = await userPrefs.getUtenteLoggato();
-    if (cfSalvato != null) {
+    
+    //Verifico se l'utente ha una sessione attiva sia localmente che su Firebase Auth (Punto 2.7)
+    if (cfSalvato != null && repository.isAutenticato()) {
       //Provo a recuperare i dati aggiornati da Firebase se c'è connessione
       if (await networkChecker.isInternetAvailable()) {
         await recuperaDatiUtenteDaFirebase(cfSalvato);
       } else {
-        //Se sono offline, carico i dati dalla memoria locale per rispettare il requisito
+        //Se sono offline, carico i dati dalla memoria locale per rispettare il requisito RNF5
         final utenteLocale = await userPrefs.getDatiUtente();
         if (utenteLocale != null && utenteLocale.codiceFiscale == cfSalvato) {
           _utenteLoggato = utenteLocale;
@@ -52,7 +55,7 @@ class UtenteViewModel extends ChangeNotifier {
         }
       }
     } else {
-      //Nessun utente salvato, vado direttamente al login
+      //Nessun utente salvato o sessione Firebase scaduta, vado direttamente al login
       _caricamentoIniziale = false;
       notifyListeners();
     }
@@ -94,7 +97,7 @@ class UtenteViewModel extends ChangeNotifier {
       final utente = await repository.eseguiLogin(cfInserito.trim(), passwordInserita.trim());
       if (utente != null) {
         _utenteLoggato = utente;
-        //Salvo sia la sessione che i dati dell'utente per la persistenza
+        //Salvo sia la sessione che i dati dell'utente per la persistenza (RNF5)
         await userPrefs.salvaUtenteLoggato(cfInserito.trim());
         await userPrefs.salvaDatiUtente(utente); 
         notifyListeners();
@@ -128,10 +131,10 @@ class UtenteViewModel extends ChangeNotifier {
       return;
     }
 
-    final validation = validaDatiRegistrazione(nome, cognome, cf, password, eta, categoria);
-    if (!validation.item1) { //è boolean, quini se non true
-      //Invio alla UI il segnale di fail e il motivo grazie a item2 (String)
-      onRisultato(false, validation.item2);
+    //Validazione dei dati tramite Record di Dart 3 (Punto 3.5)
+    final (bool successoValidazione, String msgValidazione) = validaDatiRegistrazione(nome, cognome, cf, password, eta, categoria);
+    if (!successoValidazione) {
+      onRisultato(false, msgValidazione);
       return;
     }
 
@@ -189,8 +192,8 @@ class UtenteViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  //effettua il logout eliminando la sessione corrente sia su Firebase che in locale
-  void logout() async {
+  //effettua il logout eliminando la sessione corrente sia su Firebase che in locale (Punto 2.4)
+  Future<void> logout() async {
     _utenteLoggato = null;
     await userPrefs.logout();
     await repository.signOut();
@@ -232,15 +235,15 @@ class UtenteViewModel extends ChangeNotifier {
 
     try {
       await repository.eliminaUtente(cf);
-      logout();
+      await logout(); //Uso await per garantire la pulizia prima del risultato
       onRisultato(true, "Account eliminato");
     } catch (e) {
       onRisultato(false, "Errore eliminazione account");
     }
   }
 
-  //effettua la validazione dei dati inseriti in fase di registrazione (Età, CF, Password)
-  Oggetti2<bool, String> validaDatiRegistrazione(
+  //effettua la validazione dei dati inseriti in fase di registrazione (Punto 3.5: uso Record)
+  (bool, String) validaDatiRegistrazione(
     String nome,
     String cognome,
     String cf,
@@ -249,13 +252,13 @@ class UtenteViewModel extends ChangeNotifier {
     String categoria,
   ) {
     final regexNomeCognome = RegExp(r"^[a-zA-ZÀ-ÿ\s']+$");
-    if (!regexNomeCognome.hasMatch(nome)) return const Oggetti2(false, "Nome non valido");
-    if (!regexNomeCognome.hasMatch(cognome)) return const Oggetti2(false, "Cognome non valido");
+    if (!regexNomeCognome.hasMatch(nome)) return (false, "Nome non valido");
+    if (!regexNomeCognome.hasMatch(cognome)) return (false, "Cognome non valido");
 
     final regexCF = RegExp(r"^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$");
-    if (!regexCF.hasMatch(cf.toUpperCase())) return const Oggetti2(false, "Codice Fiscale non valido");
+    if (!regexCF.hasMatch(cf.toUpperCase())) return (false, "Codice Fiscale non valido");
 
-    if (password.length < 6) return const Oggetti2(false, "Password troppo corta (min 6)");
+    if (password.length < 6) return (false, "Password troppo corta (min 6)");
 
     final etaVal = int.tryParse(eta) ?? 0;
     int etaMinima = 18;
@@ -268,15 +271,8 @@ class UtenteViewModel extends ChangeNotifier {
       case "A": case "D": case "DE": etaMinima = 24; break;
     }
 
-    if (etaVal < etaMinima) return Oggetti2(false, "Età minima per $categoria è $etaMinima");
+    if (etaVal < etaMinima) return (false, "Età minima per $categoria è $etaMinima");
 
-    return const Oggetti2(true, "");
+    return (true, "");
   }
-}
-
-//Classe di utilità per restituire coppie di valori (es. Esito e Messaggio)
-class Oggetti2<T1, T2> {
-  final T1 item1;
-  final T2 item2;
-  const Oggetti2(this.item1, this.item2);
 }

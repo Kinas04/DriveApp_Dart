@@ -20,6 +20,14 @@ class _SchermataLoginState extends State<SchermataLogin> {
   String messaggioErrore = "";
   bool inCaricamento = false;
 
+  @override
+  void dispose() {
+    //Liberiamo le risorse dei controller per evitare memory leak (Punto 2.8)
+    codiceController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   //gestisce la procedura di login tramite il ViewModel e visualizza l'esito all'utente
   Future<void> login(UtenteViewModel viewModel) async {
     //Attivo lo stato di caricamento e pulisco eventuali errori precedenti
@@ -63,7 +71,7 @@ class _SchermataLoginState extends State<SchermataLogin> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Center(
-          //Uso SingleChildScrollView per prevenire overflow quando la tastiera è aperta
+          //Uso SingleChildScrollView solo qui per prevenire overflow (Punto 3.7: rimosso annidamento)
           child: SingleChildScrollView(
             child: isCompatto ? _buildLayoutCompatto(viewModel) : _buildLayoutTablet(viewModel),
           ),
@@ -74,7 +82,7 @@ class _SchermataLoginState extends State<SchermataLogin> {
 
   //layout verticale ottimizzato per smartphone con elementi incolonnati
   Widget _buildLayoutCompatto(UtenteViewModel viewModel) {
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -101,7 +109,8 @@ class _SchermataLoginState extends State<SchermataLogin> {
             child: Container(
               constraints: const BoxConstraints(maxWidth: 400),
               padding: const EdgeInsets.all(32.0),
-              child: SingleChildScrollView(child: _buildModuloLogin(viewModel)),
+              //Rimosso SingleChildScrollView ridondante (Punto 3.7)
+              child: _buildModuloLogin(viewModel),
             ),
           ),
         ),
@@ -150,11 +159,12 @@ class _SchermataLoginState extends State<SchermataLogin> {
   Widget _buildModuloLogin(UtenteViewModel viewModel) {
     return Column(
       children: [
-        //Campo per l'inserimento del Codice Fiscale con formattazione automatica in maiuscolo
+        //Campo per l'inserimento del Codice Fiscale con fix posizione cursore (Punto 2.2)
         TextField(
           controller: codiceController,
           onChanged: (v) {
             String testoFormattato = viewModel.formattaCodiceFiscale(v);
+            //Mantengo la posizione del cursore calcolando l'offset (Punto 2.2)
             codiceController.value = TextEditingValue(
               text: testoFormattato,
               selection: TextSelection.collapsed(offset: testoFormattato.length),

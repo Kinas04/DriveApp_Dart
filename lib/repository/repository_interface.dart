@@ -59,4 +59,7 @@ abstract class RepositoryInterface {
 
   //effettua la disconnessione della sessione corrente da Firebase Auth
   Future<void> signOut();
+
+  //verifica se l'utente è attualmente autenticato con un token valido su Firebase Auth
+  bool isAutenticato();
 }

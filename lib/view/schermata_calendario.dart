@@ -6,6 +6,7 @@ import '../model/lezione.dart';
 import '../model/esame.dart';
 import '../model/slot_guida.dart';
 
+//Schermata del calendario che permette di consultare lezioni, esami e guide in base alla data selezionata
 class SchermataCalendario extends StatefulWidget {
   const SchermataCalendario({super.key});
 
@@ -17,7 +18,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
   int _tabSelezionato = 0;
   DateTime _dataSelezionata = DateTime.now();
 
-  //Inzializzo le tre liste necessarie a vuoote
+  //Liste locali per memorizzare gli eventi del giorno filtrati per categoria
   List<Lezione> _lezioni = [];
   List<Esame> _esami = [];
   List<SlotGuida> _guide = [];
@@ -28,13 +29,13 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
   @override
   void initState() {
     super.initState();
-    //caricamento iniziale post-frame (dopo che arrivo sulla schermata) per avere il contesto pronto ed evitare errori di build
+    //Caricamento iniziale eseguito dopo il rendering del primo frame per garantire la disponibilità del contesto
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _caricaEventi();
     });
   }
 
-  //chiamata al ViewModel per recuperare gli eventi filtrati per data e tab selezionato
+  //chiamata al ViewModel per recuperare gli eventi dal database in base a data e tab attivo
   Future<void> _caricaEventi() async {
     final viewModel = Provider.of<CalendarioViewModel>(context, listen: false);
     
@@ -49,7 +50,6 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
       (lezioni, esami, guide, errore) {
         if (mounted) {
           setState(() {
-            //Carico ora le liste con le varie lezioni
             _lezioni = lezioni;
             _esami = esami;
             _guide = guide;
@@ -63,7 +63,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
 
   @override
   Widget build(BuildContext context) {
-    //determiniamo se lo schermo è cellulare o tablet per gestire il layout responsive
+    //Determiniamo la larghezza dello schermo per gestire la responsiveness (Punto 4: Tablet support)
     final double larghezzaSchermo = MediaQuery.of(context).size.width;
     final bool isCompatto = larghezzaSchermo < 600;
 
@@ -75,7 +75,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
     );
   }
 
-  //layout verticale ottimizzato per smartphone
+  //layout verticale a colonna singola per smartphone
   Widget _buildLayoutCompatto() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
@@ -96,14 +96,14 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
     );
   }
 
-  //layout a due colonne ottimizzato per tablet o schermi larghi
+  //layout a due colonne ottimizzato per tablet: calendario a sinistra e lista eventi a destra
   Widget _buildLayoutTablet() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          //colonna sinistra con titolo e calendario selezionabile
+          //Colonna dedicata alla selezione della data
           Expanded(
             flex: 12,
             child: SingleChildScrollView(
@@ -118,7 +118,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
             ),
           ),
           const SizedBox(width: 32),
-          //colonna destra con selettore categoria e lista degli eventi caricati
+          //Colonna dedicata alla visualizzazione dei dettagli degli eventi
           Expanded(
             flex: 10,
             child: Column(
@@ -144,7 +144,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
     );
   }
 
-  //barra dei tab per switchare tra visualizzazione lezioni, esami e guide
+  //selettore orizzontale per filtrare tra Lezioni, Esami e Guide
   Widget _buildSelettoreTabs() {
     final tabs = ["Lezioni", "Esami", "Guide"];
     return Container(
@@ -186,7 +186,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
     );
   }
 
-  //widget del calendario per selezionare il giorno desiderato
+  //widget del calendario Material Design per la selezione del giorno
   Widget _buildCalendario() {
     return Card(
       elevation: 2,
@@ -203,7 +203,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
     );
   }
 
-  //mostra la data selezionata formattata in italiano
+  //mostra la data selezionata in un formato leggibile e localizzato in italiano
   Widget _buildLabelData() {
     final format = DateFormat('EEEE d MMMM', 'it_IT');
     return Text(
@@ -216,7 +216,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
     );
   }
 
-  //gestisce il rendering della lista di eventi in base allo stato di caricamento
+  //genera la lista degli eventi caricati o mostra lo stato di attesa/errore
   Widget _buildListaEventi() {
     if (_inCaricamento) {
       return const Center(child: CircularProgressIndicator());
@@ -227,7 +227,6 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
       );
     }
 
-    //associo gli elementi corretti alla lista corretta in base al tab selezionato
     final List items = _tabSelezionato == 0 ? _lezioni : (_tabSelezionato == 1 ? _esami : _guide);
 
     if (items.isEmpty) {
@@ -244,25 +243,42 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
         final item = items[index];
+        //Passaggio di icone semantiche in base al tipo di evento (Punto 3.6)
         if (item is Lezione) {
-          return _buildEventoItem("${item.oraInizio} - ${item.oraFine}", item.argomento, item.aula);
+          return _buildEventoItem(
+            "${item.oraInizio} - ${item.oraFine}", 
+            item.argomento, 
+            item.aula, 
+            Icons.school, //Icona specifica per lezioni di teoria
+          );
         } else if (item is Esame) {
-          return _buildEventoItem("${item.oraInizio} - ${item.oraFine}", "Esame ${item.tipologia} (Cat. ${item.categoriaPatente})", item.luogo);
+          return _buildEventoItem(
+            "${item.oraInizio} - ${item.oraFine}", 
+            "Esame ${item.tipologia} (Cat. ${item.categoriaPatente})", 
+            item.luogo, 
+            Icons.assignment_turned_in, //Icona specifica per appelli d'esame
+          );
         } else if (item is SlotGuida) {
           final stato = item.utentePrenotato == null ? "Disponibile" : "Prenotata";
-          return _buildEventoItem("${item.oraInizio} - ${item.oraFine}", "Guida Categoria ${item.categoriaPatente}", "${item.istruttore} - $stato");
+          return _buildEventoItem(
+            "${item.oraInizio} - ${item.oraFine}", 
+            "Guida Categoria ${item.categoriaPatente}", 
+            "${item.istruttore} - $stato", 
+            Icons.directions_car, //Icona specifica per lezioni di guida
+          );
         }
         return const SizedBox.shrink();
       },
     );
   }
 
-  //costruisce il singolo elemento della lista con orario, titolo e sottotitolo
-  Widget _buildEventoItem(String ora, String titolo, String sottotitolo) {
+  //costruisce il singolo elemento visivo della lista con icona, orario e descrizioni
+  Widget _buildEventoItem(String ora, String titolo, String sottotitolo, IconData icona) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(Icons.chat_bubble_outline, size: 20, color: Colors.black.withValues(alpha: 0.7)),
+        //Icona semantica aggiornata per migliorare la qualità del design (Punto 3.6)
+        Icon(icona, size: 20, color: Colors.black.withValues(alpha: 0.7)),
         const SizedBox(width: 16),
         Expanded(
           child: Column(

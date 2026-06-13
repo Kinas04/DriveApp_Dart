@@ -25,6 +25,16 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
   String messaggioErrore = "";
   bool inCaricamento = false;
 
+  @override
+  void dispose() {
+    //Liberiamo le risorse dei controller per evitare memory leak (Punto 2.8)
+    nomeController.dispose();
+    cognomeController.dispose();
+    codiceController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   //Elenchi statici per le opzioni dei menu a tendina (Dropdown)
   final List<String> opzioniEta = List.generate(77, (index) => (index + 14).toString());
   final List<String> opzioniCategorie = [
@@ -89,7 +99,7 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                   ),
                   const SizedBox(height: 32),
 
-                  //Campo Nome con formattazione automatica (Prime lettere maiuscole)
+                  //Campo Nome con fix posizione cursore (Punto 2.2)
                   TextField(
                     controller: nomeController,
                     onChanged: (v) {
@@ -100,11 +110,14 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                       );
                       setState(() => messaggioErrore = "");
                     },
-                    decoration: const InputDecoration(labelText: "Nome"),
+                    decoration: const InputDecoration(
+                      labelText: "Nome",
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                   const SizedBox(height: 16),
 
-                  //Campo Cognome con formattazione automatica
+                  //Campo Cognome con fix posizione cursore
                   TextField(
                     controller: cognomeController,
                     onChanged: (v) {
@@ -115,14 +128,24 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                       );
                       setState(() => messaggioErrore = "");
                     },
-                    decoration: const InputDecoration(labelText: "Cognome"),
+                    decoration: const InputDecoration(
+                      labelText: "Cognome",
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   
-                  //Campo Codice Fiscale: i caratteri vengono convertiti istantaneamente in maiuscolo
+                  //Campo Codice Fiscale con fix posizione cursore
                   TextField(
                     controller: codiceController,
-                    onChanged: (v) => codiceController.text = viewModel.formattaCodiceFiscale(v),
+                    onChanged: (v) {
+                      String testoFormattato = viewModel.formattaCodiceFiscale(v);
+                      codiceController.value = TextEditingValue(
+                        text: testoFormattato,
+                        selection: TextSelection.collapsed(offset: testoFormattato.length),
+                      );
+                      setState(() => messaggioErrore = "");
+                    },
                     decoration: InputDecoration(
                       labelText: "Codice Fiscale",
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -141,9 +164,9 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                   ),
                   const SizedBox(height: 16),
                   
-                  //Menu a tendina per la selezione dell'età dell'utente
+                  //Menu a tendina per la selezione dell'età dell'utente (Punto 2.3: initialValue -> value)
                   DropdownButtonFormField<String>(
-                    initialValue: etaSelezionata,
+                    value: etaSelezionata,
                     decoration: InputDecoration(
                       labelText: "Età",
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -153,9 +176,9 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                   ),
                   const SizedBox(height: 16),
                   
-                  //Selettore per la categoria di patente ministeriale richiesta
+                  //Selettore per la categoria di patente ministeriale (Punto 2.3: fixed parameter)
                   DropdownButtonFormField<String>(
-                    initialValue: categoriaSelezionata,
+                    value: categoriaSelezionata,
                     decoration: InputDecoration(
                       labelText: "Patente richiesta",
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -165,7 +188,7 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                   ),
                   
                   const SizedBox(height: 8),
-                  //Area per la visualizzazione dei messaggi di errore (centrati e su più righe)
+                  //Area per la visualizzazione dei messaggi di errore
                   Container(
                     constraints: const BoxConstraints(minHeight: 20),
                     width: double.infinity,
@@ -202,7 +225,7 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                   const Text("Hai già un account?", style: TextStyle(fontSize: 14)),
                   const SizedBox(height: 8),
                   
-                  //Pulsante per annullare e tornare alla schermata di login
+                  //Pulsante per tornare alla schermata di login
                   SizedBox(
                     width: double.infinity,
                     height: 56,

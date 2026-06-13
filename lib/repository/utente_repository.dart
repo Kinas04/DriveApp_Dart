@@ -255,4 +255,10 @@ class UtenteRepository implements RepositoryInterface {
   Future<void> signOut() async {
     await auth.signOut();
   }
+
+  //restituisce true se esiste un utente Firebase correntemente loggato
+  @override
+  bool isAutenticato() {
+    return auth.currentUser != null;
+  }
 }

@@ -18,7 +18,15 @@ class _SchermataSicurezzaState extends State<SchermataSicurezza> {
   bool inCaricamento = false;
   String messaggioErrore = "";
 
-  //procedura di cambio password che verifica la credenziale precedente prima di procedere all'aggiornamento
+  @override
+  void dispose() {
+    //Rilascio dei controller per evitare memory leak (Punto 2.8)
+    oldPasswordController.dispose();
+    newPasswordController.dispose();
+    super.dispose();
+  }
+
+  //procedura di cambio password (Punto 2.5: corretta firma in Future<void>)
   Future<void> _cambiaPassword(UtenteViewModel viewModel) async {
     setState(() {
       inCaricamento = true;
