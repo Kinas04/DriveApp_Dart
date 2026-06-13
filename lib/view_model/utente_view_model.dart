@@ -50,7 +50,7 @@ class UtenteViewModel extends ChangeNotifier {
             _caricamentoIniziale = false;
             notifyListeners();
           } else {
-            throw Exception("Offline e nessuna cache disponibile");
+            throw Exception("Errore di rete.");
           }
         }
       }, onFallimentoDefinitivo: () {
@@ -106,21 +106,20 @@ class UtenteViewModel extends ChangeNotifier {
 
   //gestisce la procedura di login verificando le credenziali su Firebase e salvando i dati per l'offline
   Future<void> eseguiLogin(String cfInserito, String passwordInserita, Function(bool, String) onRisultato) async {
+    if (cfInserito.trim().isEmpty || passwordInserita.trim().isEmpty) {
+      onRisultato(false, "Compila tutti i campi.");
+      return;
+    }
     //Validazione CF locale tramite regex prima di chiamare Firebase
     final regexCF = RegExp(r"^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$");
     if (!regexCF.hasMatch(cfInserito.trim().toUpperCase())) {
-      onRisultato(false, "Codice Fiscale non valido formalmente");
+      onRisultato(false, "Formato codice fiscale non valido.");
       return;
     }
 
     //Verifico subito se c'è connessione ad internet prima di procedere
     if (!await networkChecker.isInternetAvailable()) {
-      onRisultato(false, "Connessione assente. Impossibile accedere.");
-      return;
-    }
-
-    if (cfInserito.trim().isEmpty || passwordInserita.trim().isEmpty) {
-      onRisultato(false, "Campi vuoti");
+      onRisultato(false, "Connessione assente. Riprova.");
       return;
     }
 
@@ -132,12 +131,12 @@ class UtenteViewModel extends ChangeNotifier {
         await userPrefs.salvaUtenteLoggato(cfInserito.trim());
         await userPrefs.salvaDatiUtente(utente); 
         notifyListeners();
-        onRisultato(true, "Login eseguito con successo");
+        onRisultato(true, "Login eseguito con successo.");
       } else {
-        onRisultato(false, "Utente non trovato");
+        onRisultato(false, "Utente non trovato.");
       }
     } catch (e) {
-      onRisultato(false, "Password errata o errore connessione");
+      onRisultato(false, "Errore password.");
     }
   }
 
@@ -153,12 +152,12 @@ class UtenteViewModel extends ChangeNotifier {
   }) async {
     //Controllo la connessione anche in fase di registrazione
     if (!await networkChecker.isInternetAvailable()) {
-      onRisultato(false, "Connessione assente. Registrazione non possibile.");
+      onRisultato(false, "Connessione assente. Riprova.");
       return;
     }
 
     if (nome.isEmpty || cognome.isEmpty || eta.isEmpty || cf.isEmpty || password.isEmpty || categoria.isEmpty) {
-      onRisultato(false, "Compila tutti i campi");
+      onRisultato(false, "Compila tutti i campi.");
       return;
     }
 
@@ -185,7 +184,7 @@ class UtenteViewModel extends ChangeNotifier {
       await userPrefs.salvaUtenteLoggato(nuovoUtente.codiceFiscale);
       await userPrefs.salvaDatiUtente(nuovoUtente);
       notifyListeners();
-      onRisultato(true, "Registrazione completata");
+      onRisultato(true, "Registrazione completata.");
     } catch (e) {
       //Catturo il messaggio specifico se l'utente esiste già
       onRisultato(false, e.toString().replaceAll("Exception: ", ""));
@@ -237,18 +236,18 @@ class UtenteViewModel extends ChangeNotifier {
     if (cf == null) return;
 
     if (vecchiaPassword.trim().isEmpty || nuovaPassword.trim().isEmpty) {
-      onRisultato(false, "Campi vuoti");
+      onRisultato(false, "Compila tutti i campi.");
       return;
     }
 
     //Controllo lunghezza minima password durante la fase di cambio
     if (nuovaPassword.length < 6) {
-      onRisultato(false, "La nuova password deve essere di almeno 6 caratteri");
+      onRisultato(false, "La nuova password deve essere di almeno 6 caratteri.");
       return;
     }
 
     if (vecchiaPassword == nuovaPassword) {
-      onRisultato(false, "Le password sono uguali");
+      onRisultato(false, "Le password sono uguali.");
       return;
     }
 
@@ -256,12 +255,12 @@ class UtenteViewModel extends ChangeNotifier {
       final check = await repository.eseguiLogin(cf, vecchiaPassword);
       if (check != null) {
         await repository.cambiaPassword(nuovaPassword);
-        onRisultato(true, "Password cambiata con successo");
+        onRisultato(true, "Password cambiata con successo.");
       } else {
-        onRisultato(false, "Vecchia password errata");
+        onRisultato(false, "Vecchia password errata.");
       }
     } catch (e) {
-      onRisultato(false, "Errore durante il cambio password");
+      onRisultato(false, "Errore durante il cambio password.");
     }
   }
 
@@ -273,9 +272,9 @@ class UtenteViewModel extends ChangeNotifier {
     try {
       await repository.eliminaUtente(cf);
       await logout(); //Uso await per garantire la pulizia prima del risultato
-      onRisultato(true, "Account eliminato");
+      onRisultato(true, "Account eliminato.");
     } catch (e) {
-      onRisultato(false, "Errore eliminazione account");
+      onRisultato(false, "Errore eliminazione account.");
     }
   }
 
@@ -289,13 +288,13 @@ class UtenteViewModel extends ChangeNotifier {
     String categoria,
   ) {
     final regexNomeCognome = RegExp(r"^[a-zA-ZÀ-ÿ\s']+$");
-    if (!regexNomeCognome.hasMatch(nome)) return (false, "Nome non valido");
-    if (!regexNomeCognome.hasMatch(cognome)) return (false, "Cognome non valido");
+    if (!regexNomeCognome.hasMatch(nome)) return (false, "Nome non valido.");
+    if (!regexNomeCognome.hasMatch(cognome)) return (false, "Cognome non valido.");
 
     final regexCF = RegExp(r"^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$");
-    if (!regexCF.hasMatch(cf.toUpperCase())) return (false, "Codice Fiscale non valido");
+    if (!regexCF.hasMatch(cf.toUpperCase())) return (false, "Codice Fiscale non valido.");
 
-    if (password.length < 6) return (false, "Password troppo corta (min 6)");
+    if (password.length < 6) return (false, "Password troppo corta (min 6).");
 
     final etaVal = int.tryParse(eta) ?? 0;
     int etaMinima = 18;
@@ -308,7 +307,7 @@ class UtenteViewModel extends ChangeNotifier {
       case "A": case "D": case "DE": etaMinima = 24; break;
     }
 
-    if (etaVal < etaMinima) return (false, "Età minima per $categoria è $etaMinima");
+    if (etaVal < etaMinima) return (false, "Età minima per $categoria è $etaMinima.");
 
     return (true, "");
   }
