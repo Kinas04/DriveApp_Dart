@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
+//Classe che rappresenta un appello d'esame (teorico o pratico) nel sistema
 class Esame {
 
   String idEsame;
@@ -21,6 +21,7 @@ class Esame {
     this.tipologia,
   );
 
+  //trasforma un documento Firestore in un oggetto Esame mappando i vari campi
   factory Esame.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
@@ -37,6 +38,7 @@ class Esame {
     );
   }
 
+  //converte l'oggetto Esame in una mappa compatibile con il salvataggio su Firestore
   Map<String, dynamic> toFirestore() {
     return {
       "data": Timestamp.fromDate(data),
@@ -49,4 +51,3 @@ class Esame {
   }
 
 }
-

@@ -3,35 +3,35 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'view/SchermataLogin.dart';
-import 'view/SchermataRegistrazione.dart';
-import 'view/MainScreen.dart';
-import 'viewModel/UtenteViewModel.dart';
-import 'viewModel/CalendarioViewModel.dart';
-import 'viewModel/EsitiViewModel.dart';
-import 'viewModel/PrenotaViewModel.dart';
-import 'repository/UtenteRepository.dart';
-import 'repository/ConnectivityCheckerImpl.dart';
-import 'data/PreferenzeUtente.dart';
+import 'view/schermata_login.dart';
+import 'view/schermata_registrazione.dart';
+import 'view/main_screen.dart';
+import 'view_model/utente_view_model.dart';
+import 'view_model/calendario_view_model.dart';
+import 'view_model/esiti_view_model.dart';
+import 'view_model/prenota_view_model.dart';
+import 'repository/utente_repository.dart';
+import 'repository/connectivity_checker_impl.dart';
+import 'data/preferences_repository.dart';
 
+//Punto di ingresso principale dell'applicazione Flutter
 void main() async {
-  //Come prima cosa, inizializzo Firebase (FONDAMENTALE) e la formattazione italiana prevista per i nostri scopi
+  //Inizializzo i binding di sistema e configuro Firebase (fondamentale per Auth e Firestore)
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  
+  //Configuro il supporto alla localizzazione italiana per la formattazione delle date
   await initializeDateFormatting('it_IT', null);
 
-  //Inizializzo una variabile immutabile (final) che fa riferimento alla repository dell'utente
+  //Istanzio la repository che verrà condivisa tra tutti i ViewModel (Pattern Dependency Injection)
   final repository = UtenteRepository();
   
   runApp(
-    /*Quando avviamo l'app, con Multiprovider iniettiamo contemporaneamente diversi oggetti
-    che corrispondono in questo caso ai vari ViewModel
-    ogni ChangeNotifier crea un'istanza di questi view model (per ognuna, tranne per utente, è
-    sufficiente passare il riferimento alla repository condivisa tra le stesse. Utente richiede
-    più parametri tra cui le sue preferenze e il check per la connessione
-    Viene creato quindi un albero di widget*/
+    /*Utilizzo MultiProvider per iniettare le dipendenze logiche a livello globale
+    Ogni ViewModel viene creato una sola volta e reso accessibile da qualsiasi widget dell'app*/
     MultiProvider(
       providers: [
+        //ViewModel utente: gestisce autenticazione, persistenza locale e stato della connessione
         ChangeNotifierProvider(
           create: (_) => UtenteViewModel(
             repository: repository,
@@ -39,26 +39,26 @@ void main() async {
             networkChecker: ConnectivityCheckerImpl(),
           ),
         ),
+        //ViewModel per la gestione degli eventi del calendario (Lezioni ed Esami)
         ChangeNotifierProvider(
           create: (_) => CalendarioViewModel(repository: repository),
         ),
+        //ViewModel per la visualizzazione dello storico degli esiti
         ChangeNotifierProvider(
           create: (_) => EsitiViewModel(repository: repository),
         ),
+        //ViewModel dedicato alla logica di prenotazione di nuovi appelli o guide
         ChangeNotifierProvider(
           create: (_) => PrenotaViewModel(repository: repository),
         ),
       ],
-      /*Alla fine decidiamo il widget FIGLIO che accede al resto dell'albero
-      In questo caso tutta l'app, quindi qualsiasi schermata può recuperare i viewmodel */
+      //L'intera applicazione (MyApp) è il widget figlio che può usufruire dei provider definiti sopra
       child: const MyApp(),
     ),
   );
 }
 
-/*Quindi, come si vede anche nelle varie schermate, utilizzando il contesto è possibile "navigare" verso le altre pagine
-con "push e pull" a seconda se è necessario entrare in schermata o uscire (es. tasto chiudi, esci...) */
-
+//Widget root dell'app che configura il tema Material Design e il sistema di navigazione
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         colorSchemeSeed: Colors.blue,
       ),
-      //Serve al calendario per avere i mesi in italiano
+      //Configurazione delegati per tradurre i widget standard di Flutter (es. calendari, menu) in italiano
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -81,11 +81,13 @@ class MyApp extends StatelessWidget {
         Locale('it', 'IT'),
       ],
       locale: const Locale('it', 'IT'),
+      //Avviamo il RootNavigator che deciderà quale schermata mostrare (Login o Home)
       home: const RootNavigator(),
     );
   }
 }
 
+//Gestore della navigazione principale che reagisce allo stato dell'autenticazione utente
 class RootNavigator extends StatefulWidget {
   const RootNavigator({super.key});
 
@@ -94,14 +96,15 @@ class RootNavigator extends StatefulWidget {
 }
 
 class _RootNavigatorState extends State<RootNavigator> {
+  //Stato locale per switchare graficamente tra Login e Registrazione
   bool mostraRegistrazione = false;
 
   @override
   Widget build(BuildContext context) {
-    // Usiamo la funzione Consumer per reagire ai cambiamenti del ViewModel, passandolo come tipo
+    //Reagiamo istantaneamente ai cambiamenti del ViewModel dell'utente loggato
     return Consumer<UtenteViewModel>(
       builder: (context, viewModel, child) {
-        //Schermata di caricamento iniziale
+        //Visualizzazione indicatore di caricamento durante il ripristino della sessione all'avvio
         if (viewModel.caricamentoIniziale) {
           return const Scaffold(
             body: Center(
@@ -110,7 +113,7 @@ class _RootNavigatorState extends State<RootNavigator> {
           );
         }
 
-        //Se c'è un errore di connessione persistente all'avvio
+        //Gestione specifica dell'errore di connessione persistente che blocca l'operatività iniziale
         if (viewModel.erroreConnessione) {
           return Scaffold(
             body: Center(
@@ -131,6 +134,7 @@ class _RootNavigatorState extends State<RootNavigator> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),
+                    //Pulsante per forzare un nuovo tentativo di collegamento al server
                     ElevatedButton(
                       onPressed: () => viewModel.riprovaConnessione(),
                       child: const Text("RIPROVA"),
@@ -142,14 +146,12 @@ class _RootNavigatorState extends State<RootNavigator> {
           );
         }
 
-        //Se l'utente è loggato correttamente, mostra la schermata principale
+        //Se i dati dell'utente sono presenti (anche caricati offline per RNF5), mostra la dashboard
         if (viewModel.utenteLoggato != null) {
           return const MainScreen();
         }
 
-        /* Flusso di Autenticazione:
-        ALl'interno abbiamo due listener che portano rispettivamente alla schermata di registrazione o login
-        in base al valore di mostraRegistrazione, si riesce a switchare tra le due schermate*/
+        //In assenza di login, mostra il flusso di autenticazione con animazione fluida tra le due schermate
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 600),
           child: mostraRegistrazione

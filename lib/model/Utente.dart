@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
+//Classe che rappresenta l'utente del sistema con i suoi dati anagrafici e la patente richiesta
 class Utente {
   String nome;
   String cognome;
@@ -16,6 +16,7 @@ class Utente {
     this.categoriaRichiesta,
   );
 
+  //trasforma un documento proveniente da Firestore in un oggetto Utente
   factory Utente.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
@@ -30,7 +31,8 @@ class Utente {
     );
   }
 
-  Map<String, dynamic> toFirestore() {
+  //converte l'oggetto in una mappa per facilitare il salvataggio in locale o su JSON
+  Map<String, dynamic> toMap() {
     return {
       "nome": nome,
       "cognome": cognome,
@@ -38,5 +40,21 @@ class Utente {
       "codiceFiscale": codiceFiscale,
       "categoriaRichiesta": categoriaRichiesta,
     };
+  }
+
+  //crea un'istanza di Utente a partire da una mappa (usato per il recupero dati offline)
+  factory Utente.fromMap(Map<String, dynamic> map) {
+    return Utente(
+      map['nome'] ?? '',
+      map['cognome'] ?? '',
+      map['eta'] ?? 0,
+      map['codiceFiscale'] ?? '',
+      map['categoriaRichiesta'] ?? '',
+    );
+  }
+
+  //mappa i dati per l'invio al database Firestore
+  Map<String, dynamic> toFirestore() {
+    return toMap();
   }
 }

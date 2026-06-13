@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
+//Classe che rappresenta una lezione di teoria programmata nell'autoscuola
 class Lezione {
 
   String idLezione;
@@ -26,11 +26,11 @@ class Lezione {
     SnapshotOptions? options,
   ) {
     /*Facciamo riferimento ai dati mappati attraverso la variabile final data
-    Viene catturato uno snapshot dei dati*/
+    Viene catturato uno snapshot dei dati del documento*/
     final data = snapshot.data();
     return Lezione(
       snapshot.id,
-      //Convertiamo in Timestamp comprensibile da Firebase
+      //Convertiamo il Timestamp di Firebase in un oggetto DateTime di Dart
       (data?['dataLezione'] as Timestamp).toDate(),
       data?['oraInizio'] ?? '',
       data?['oraFine'] ?? '',
@@ -41,7 +41,7 @@ class Lezione {
 
   /*Poi, quando devo fare scritture sul DB, poichè i dati su Firebase
   sono mappati (chiave,valore), rimappo nuovamente tutti parametri del costruttore
-  con un metodo di tipo Map*/
+  con un metodo di tipo Map per l'invio al database*/
   Map<String, dynamic> toFirestore() {
     return {
       'dataLezione': Timestamp.fromDate(dataLezione),
@@ -52,4 +52,3 @@ class Lezione {
     };
   }
 }
-
