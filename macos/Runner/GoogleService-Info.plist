@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyAehNkvbi9HFSqATrnNvi6TqKAJqJT8EVw</string>
+	<key>GCM_SENDER_ID</key>
+	<string>50112590303</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.driveAppDart</string>
+	<key>PROJECT_ID</key>
+	<string>driveapp-b55c3</string>
+	<key>STORAGE_BUCKET</key>
+	<string>driveapp-b55c3.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:50112590303:ios:38e7e00a80fbd56306d46a</string>
+</dict>
+</plist>
