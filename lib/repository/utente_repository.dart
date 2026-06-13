@@ -122,8 +122,9 @@ class UtenteRepository implements RepositoryInterface {
   @override
   Future<List<Esame>> getEsamiPerId(List<String> ids) async {
     if (ids.isEmpty) return [];
+    //Allineamento logica Kotlin: filtro sul campo 'idEsame' all'interno del documento (Punto 1)
     final query = await firestore.collection("esami")
-        .where(FieldPath.documentId, whereIn: ids)
+        .where("idEsame", whereIn: ids)
         .get();
     return query.docs.map((doc) => Esame.fromFirestore(doc, null)).toList();
   }
@@ -131,12 +132,15 @@ class UtenteRepository implements RepositoryInterface {
   //filtra gli esami futuri che corrispondono alla categoria di patente dell'utente
   @override
   Future<List<Esame>> getEsamiFuturi(String categoria, DateTime data) async {
+    //Allineamento logica Kotlin: filtro prima per categoria su Firestore per scaricare meno dati (Punto 2)
     final query = await firestore.collection("esami")
-        .where("data", isGreaterThan: data)
+        .where("categoriaPatente", isEqualTo: categoria)
         .get();
+    
+    //Successivamente filtro per data in memoria come avviene nella versione Kotlin (Punto 2)
     return query.docs
         .map((doc) => Esame.fromFirestore(doc, null))
-        .where((e) => e.categoriaPatente == categoria)
+        .where((e) => e.data.isAfter(data))
         .toList();
   }
 
@@ -152,12 +156,15 @@ class UtenteRepository implements RepositoryInterface {
   //recupera gli slot guida futuri filtrando per categoria di patente
   @override
   Future<List<SlotGuida>> getGuideFuture(String categoria, DateTime data) async {
+    //Allineamento logica Kotlin: filtro prima per categoria su Firestore per maggiore efficienza (Punto 2)
     final query = await firestore.collection("slot_guide")
-        .where("data", isGreaterThan: data)
+        .where("categoriaPatente", isEqualTo: categoria)
         .get();
+    
+    //Filtro temporale eseguito in locale post-query (Punto 2)
     return query.docs
         .map((doc) => SlotGuida.fromFirestore(doc, null))
-        .where((g) => g.categoriaPatente == categoria)
+        .where((g) => g.data.isAfter(data))
         .toList();
   }
 

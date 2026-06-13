@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../model/utente.dart';
 import '../repository/repository_interface.dart';
@@ -37,28 +38,51 @@ class UtenteViewModel extends ChangeNotifier {
     
     //Verifico se l'utente ha una sessione attiva sia localmente che su Firebase Auth (Punto 2.7)
     if (cfSalvato != null && repository.isAutenticato()) {
-      //Provo a recuperare i dati aggiornati da Firebase se c'è connessione
-      if (await networkChecker.isInternetAvailable()) {
-        await recuperaDatiUtenteDaFirebase(cfSalvato);
-      } else {
-        //Se sono offline, carico i dati dalla memoria locale per rispettare il requisito RNF5
-        final utenteLocale = await userPrefs.getDatiUtente();
-        if (utenteLocale != null && utenteLocale.codiceFiscale == cfSalvato) {
-          _utenteLoggato = utenteLocale;
-          _caricamentoIniziale = false;
-          notifyListeners();
+      //Provo a recuperare i dati aggiornati da Firebase con logica di retry (Punto 5)
+      await _eseguiConRetry(() async {
+        if (await networkChecker.isInternetAvailable()) {
+          await recuperaDatiUtenteDaFirebase(cfSalvato);
         } else {
-          //Se non ho dati locali validi e sono offline, mostro errore di connessione
-          _erroreConnessione = true;
-          _caricamentoIniziale = false;
-          notifyListeners();
+          //Se sono offline, carico i dati dalla memoria locale per rispettare il requisito RNF5
+          final utenteLocale = await userPrefs.getDatiUtente();
+          if (utenteLocale != null && utenteLocale.codiceFiscale == cfSalvato) {
+            _utenteLoggato = utenteLocale;
+            _caricamentoIniziale = false;
+            notifyListeners();
+          } else {
+            throw Exception("Offline e nessuna cache disponibile");
+          }
         }
-      }
+      }, onFallimentoDefinitivo: () {
+        _erroreConnessione = true;
+        _caricamentoIniziale = false;
+        notifyListeners();
+      });
     } else {
       //Nessun utente salvato o sessione Firebase scaduta, vado direttamente al login
       _caricamentoIniziale = false;
       notifyListeners();
     }
+  }
+
+  //Logica di retry per operazioni critiche allineata alla versione Kotlin (Punto 5)
+  Future<void> _eseguiConRetry(Future<void> Function() operazione, {required VoidCallback onFallimentoDefinitivo}) async {
+    int tentativi = 0;
+    const maxTentativi = 2; //Riprovo una volta dopo il primo fallimento
+    
+    while (tentativi < maxTentativi) {
+      try {
+        await operazione().timeout(const Duration(seconds: 8)); //Timeout di 8 secondi (Punto 5)
+        return; //Successo
+      } catch (e) {
+        tentativi++;
+        if (tentativi < maxTentativi) {
+          //Attesa di 10 secondi prima del prossimo tentativo (Punto 5)
+          await Future.delayed(const Duration(seconds: 10));
+        }
+      }
+    }
+    onFallimentoDefinitivo();
   }
 
   //forza la scrittura in upper case del codice fiscale
@@ -82,6 +106,13 @@ class UtenteViewModel extends ChangeNotifier {
 
   //gestisce la procedura di login verificando le credenziali su Firebase e salvando i dati per l'offline
   Future<void> eseguiLogin(String cfInserito, String passwordInserita, Function(bool, String) onRisultato) async {
+    //Validazione CF locale tramite regex prima di chiamare Firebase per allineamento Kotlin (Punto 3)
+    final regexCF = RegExp(r"^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$");
+    if (!regexCF.hasMatch(cfInserito.trim().toUpperCase())) {
+      onRisultato(false, "Codice Fiscale non valido formalmente");
+      return;
+    }
+
     //Verifico subito se c'è connessione ad internet prima di procedere
     if (!await networkChecker.isInternetAvailable()) {
       onRisultato(false, "Connessione assente. Impossibile accedere.");
@@ -207,6 +238,12 @@ class UtenteViewModel extends ChangeNotifier {
 
     if (vecchiaPassword.trim().isEmpty || nuovaPassword.trim().isEmpty) {
       onRisultato(false, "Campi vuoti");
+      return;
+    }
+
+    //Controllo lunghezza minima password al cambio per allineamento Kotlin (Punto 4)
+    if (nuovaPassword.length < 6) {
+      onRisultato(false, "La nuova password deve essere di almeno 6 caratteri");
       return;
     }
 
