@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'firebase_options.dart';
 import 'view/schermata_login.dart';
 import 'view/schermata_registrazione.dart';
 import 'view/main_screen.dart';
@@ -18,7 +19,9 @@ import 'data/preferences_repository.dart';
 void main() async {
   //Inizializzo i binding di sistema e configuro Firebase (fondamentale per Auth e Firestore)
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   
   //Configuro il supporto alla localizzazione italiana per la formattazione delle date
   await initializeDateFormatting('it_IT', null);

@@ -186,8 +186,8 @@ class UtenteViewModel extends ChangeNotifier {
       notifyListeners();
       onRisultato(true, "Registrazione completata.");
     } catch (e) {
-      //Catturo il messaggio specifico se l'utente esiste già
-      onRisultato(false, e.toString().replaceAll("Exception: ", ""));
+      // Messaggio di errore per ogni altro caso particolare
+      onRisultato(false, "Errore di rete.");
     }
   }
 
