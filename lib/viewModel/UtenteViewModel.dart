@@ -24,10 +24,20 @@ class UtenteViewModel extends ChangeNotifier {
   Utente? _utenteLoggato;
   Utente? get utenteLoggato => _utenteLoggato;
 
+  bool _erroreConnessione = false;
+  bool get erroreConnessione => _erroreConnessione;
+
   //blocco eseguito automaticamente al lancio per recuperare l'utente loggato
   Future<void> _inizializza() async {
     final cfSalvato = await userPrefs.getUtenteLoggato();
     if (cfSalvato != null) {
+      //Verifico la connessione prima di provare a recuperare i dati da Firebase
+      if (!await networkChecker.isInternetAvailable()) {
+        _erroreConnessione = true;
+        _caricamentoIniziale = false;
+        notifyListeners();
+        return;
+      }
       await recuperaDatiUtenteDaFirebase(cfSalvato);
     } else {
       _caricamentoIniziale = false;
@@ -56,6 +66,12 @@ class UtenteViewModel extends ChangeNotifier {
 
   //gestisce la procedura di login verificando le credenziali su Firebase
   Future<void> eseguiLogin(String cfInserito, String passwordInserita, Function(bool, String) onRisultato) async {
+    //Verifico subito se c'è connessione ad internet
+    if (!await networkChecker.isInternetAvailable()) {
+      onRisultato(false, "Connessione assente. Impossibile accedere.");
+      return;
+    }
+
     if (cfInserito.trim().isEmpty || passwordInserita.trim().isEmpty) {
       onRisultato(false, "Campi vuoti");
       return;
@@ -86,6 +102,12 @@ class UtenteViewModel extends ChangeNotifier {
     required String categoria,
     required Function(bool, String) onRisultato,
   }) async {
+    //Controllo la connessione anche in fase di registrazione per garantire l'allineamento dei dati
+    if (!await networkChecker.isInternetAvailable()) {
+      onRisultato(false, "Connessione assente. Registrazione non possibile.");
+      return;
+    }
+
     if (nome.isEmpty || cognome.isEmpty || eta.isEmpty || cf.isEmpty || password.isEmpty || categoria.isEmpty) {
       onRisultato(false, "Compila tutti i campi");
       return;
@@ -122,6 +144,7 @@ class UtenteViewModel extends ChangeNotifier {
   //recupera i dati completi dell'utente una volta loggato
   Future<void> recuperaDatiUtenteDaFirebase(String cf) async {
     try {
+      _erroreConnessione = false;
       final utente = await repository.getUtente(cf);
       _utenteLoggato = utente;
     } catch (e) {
@@ -130,6 +153,19 @@ class UtenteViewModel extends ChangeNotifier {
       _caricamentoIniziale = false;
       notifyListeners();
     }
+  }
+
+  //Permette di riprovare il caricamento iniziale se era fallito per mancanza di internet
+  Future<void> riprovaConnessione() async {
+    setStateCaricamento(true);
+    await _inizializza();
+  }
+
+  //metodo di utilità per settare il caricamento
+  void setStateCaricamento(bool valore) {
+    _caricamentoIniziale = valore;
+    _erroreConnessione = false;
+    notifyListeners();
   }
 
   //effettua il logout eliminando la sessione corrente

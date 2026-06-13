@@ -166,11 +166,14 @@ class _SchermataLoginState extends State<SchermataLogin> {
           ),
         ),
         const SizedBox(height: 8),
-        SizedBox(
-          height: 20,
+        //Uso un Container con minHeight invece di un SizedBox fisso per evitare che il testo venga tagliato
+        Container(
+          constraints: const BoxConstraints(minHeight: 20),
+          width: double.infinity,
           child: Text(
             messaggioErrore,
             style: const TextStyle(color: Colors.red, fontSize: 14),
+            textAlign: TextAlign.center,
           ),
         ),
         const SizedBox(height: 8),

@@ -145,11 +145,14 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                   ),
                   
                   const SizedBox(height: 8),
-                  SizedBox(
-                    height: 20,
+                  //Racchiudo il testo in un Container senza altezza fissa per permettere il wrapping su più righe
+                  Container(
+                    constraints: const BoxConstraints(minHeight: 20),
+                    width: double.infinity,
                     child: Text(
                       messaggioErrore,
                       style: const TextStyle(color: Colors.red, fontSize: 14),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                   const SizedBox(height: 8),

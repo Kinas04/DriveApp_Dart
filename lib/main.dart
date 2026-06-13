@@ -110,6 +110,38 @@ class _RootNavigatorState extends State<RootNavigator> {
           );
         }
 
+        //Se c'è un errore di connessione persistente all'avvio
+        if (viewModel.erroreConnessione) {
+          return Scaffold(
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.wifi_off, size: 64, color: Colors.red),
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Connessione Assente",
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      "L'app ha bisogno di internet per mantenere i dati aggiornati. Controlla la tua connessione e riprova.",
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () => viewModel.riprovaConnessione(),
+                      child: const Text("RIPROVA"),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
         //Se l'utente è loggato correttamente, mostra la schermata principale
         if (viewModel.utenteLoggato != null) {
           return const MainScreen();
