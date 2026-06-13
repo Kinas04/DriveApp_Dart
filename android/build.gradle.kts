@@ -23,7 +23,7 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
-// Forza tutti i sub-progetti (plugin) a usare Java 17 con la nuova sintassi Kotlin 2.x
+// Forza tutti i sub-progetti (plugin) a usare Java 17 per garantire la compatibilità con le versioni più recenti
 subprojects {
     tasks.withType<JavaCompile>().configureEach {
         sourceCompatibility = "17"

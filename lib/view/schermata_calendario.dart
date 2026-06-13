@@ -63,7 +63,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
 
   @override
   Widget build(BuildContext context) {
-    //Determiniamo la larghezza dello schermo per gestire la responsiveness (Punto 4: Tablet support)
+    //Determiniamo la larghezza dello schermo per gestire la responsiveness (Tablet support)
     final double larghezzaSchermo = MediaQuery.of(context).size.width;
     final bool isCompatto = larghezzaSchermo < 600;
 
@@ -260,7 +260,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
         final item = items[index];
-        //Passaggio di icone semantiche in base al tipo di evento (Punto 3.6)
+        //Passaggio di icone semantiche in base al tipo di evento selezionato
         if (item is Lezione) {
           return _buildEventoItem(
             "${item.oraInizio} - ${item.oraFine}", 
@@ -294,7 +294,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        //Icona semantica aggiornata per migliorare la qualità del design (Punto 3.6)
+        //Icona semantica aggiornata per migliorare la qualità del design
         Icon(icona, size: 20, color: Colors.black.withValues(alpha: 0.7)),
         const SizedBox(width: 16),
         Expanded(

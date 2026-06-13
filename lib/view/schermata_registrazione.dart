@@ -27,7 +27,7 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
 
   @override
   void dispose() {
-    //Liberiamo le risorse dei controller per evitare memory leak (Punto 2.8)
+    //Liberiamo le risorse dei controller per evitare memory leak durante lo smontaggio del widget
     nomeController.dispose();
     cognomeController.dispose();
     codiceController.dispose();
@@ -91,7 +91,7 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  //Allineamento altezza titolo coerente con il resto del progetto
+                  //Gestione altezza titolo coerente con il resto del progetto
                   const SizedBox(height: 24),
                   const Text(
                     "Crea un account",
@@ -100,7 +100,7 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                   ),
                   const SizedBox(height: 32),
 
-                  //Campo Nome con fix posizione cursore (Punto 2.2)
+                  //Campo Nome con gestione della posizione del cursore
                   TextField(
                     controller: nomeController,
                     onChanged: (v) {
@@ -165,7 +165,7 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                   ),
                   const SizedBox(height: 16),
                   
-                  //Menu a tendina per la selezione dell'età dell'utente (Punto 2.3: initialValue -> value)
+                  //Menu a tendina per la selezione dell'età dell'utente
                   DropdownButtonFormField<String>(
                     value: etaSelezionata,
                     decoration: InputDecoration(
@@ -177,7 +177,7 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                   ),
                   const SizedBox(height: 16),
                   
-                  //Selettore per la categoria di patente ministeriale (Punto 2.3: fixed parameter)
+                  //Selettore per la categoria di patente ministeriale richiesta
                   DropdownButtonFormField<String>(
                     value: categoriaSelezionata,
                     decoration: InputDecoration(

@@ -22,7 +22,7 @@ class _SchermataLoginState extends State<SchermataLogin> {
 
   @override
   void dispose() {
-    //Liberiamo le risorse dei controller per evitare memory leak (Punto 2.8)
+    //Liberiamo le risorse dei controller per evitare memory leak durante la chiusura
     codiceController.dispose();
     passwordController.dispose();
     super.dispose();
@@ -71,7 +71,7 @@ class _SchermataLoginState extends State<SchermataLogin> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Center(
-          //Uso SingleChildScrollView solo qui per prevenire overflow (Punto 3.7: rimosso annidamento)
+          //Uso SingleChildScrollView per prevenire overflow grafici quando la tastiera è aperta
           child: SingleChildScrollView(
             child: isCompatto ? _buildLayoutCompatto(viewModel) : _buildLayoutTablet(viewModel),
           ),
@@ -110,7 +110,7 @@ class _SchermataLoginState extends State<SchermataLogin> {
             child: Container(
               constraints: const BoxConstraints(maxWidth: 400),
               padding: const EdgeInsets.all(32.0),
-              //Rimosso SingleChildScrollView ridondante (Punto 3.7)
+              //Rimozione di elementi ridondanti per pulizia layout su tablet
               child: _buildModuloLogin(viewModel),
             ),
           ),
@@ -160,12 +160,12 @@ class _SchermataLoginState extends State<SchermataLogin> {
   Widget _buildModuloLogin(UtenteViewModel viewModel) {
     return Column(
       children: [
-        //Campo per l'inserimento del Codice Fiscale con fix posizione cursore (Punto 2.2)
+        //Campo per l'inserimento del Codice Fiscale con gestione della posizione del cursore
         TextField(
           controller: codiceController,
           onChanged: (v) {
             String testoFormattato = viewModel.formattaCodiceFiscale(v);
-            //Mantengo la posizione del cursore calcolando l'offset (Punto 2.2)
+            //Mantengo la posizione del cursore per una migliore esperienza utente
             codiceController.value = TextEditingValue(
               text: testoFormattato,
               selection: TextSelection.collapsed(offset: testoFormattato.length),

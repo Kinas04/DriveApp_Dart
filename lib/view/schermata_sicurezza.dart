@@ -20,13 +20,13 @@ class _SchermataSicurezzaState extends State<SchermataSicurezza> {
 
   @override
   void dispose() {
-    //Rilascio dei controller per evitare memory leak (Punto 2.8)
+    //Rilascio dei controller per evitare memory leak durante la distruzione del widget
     oldPasswordController.dispose();
     newPasswordController.dispose();
     super.dispose();
   }
 
-  //procedura di cambio password (Punto 2.5: corretta firma in Future<void>)
+  //procedura asincrona di cambio password che verifica la credenziale precedente prima di procedere all'aggiornamento
   Future<void> _cambiaPassword(UtenteViewModel viewModel) async {
     setState(() {
       inCaricamento = true;

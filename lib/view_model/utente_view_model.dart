@@ -36,9 +36,9 @@ class UtenteViewModel extends ChangeNotifier {
   Future<void> _inizializza() async {
     final cfSalvato = await userPrefs.getUtenteLoggato();
     
-    //Verifico se l'utente ha una sessione attiva sia localmente che su Firebase Auth (Punto 2.7)
+    //Verifico se l'utente ha una sessione attiva sia localmente che su Firebase Auth
     if (cfSalvato != null && repository.isAutenticato()) {
-      //Provo a recuperare i dati aggiornati da Firebase con logica di retry (Punto 5)
+      //Provo a recuperare i dati aggiornati da Firebase con logica di retry
       await _eseguiConRetry(() async {
         if (await networkChecker.isInternetAvailable()) {
           await recuperaDatiUtenteDaFirebase(cfSalvato);
@@ -65,19 +65,19 @@ class UtenteViewModel extends ChangeNotifier {
     }
   }
 
-  //Logica di retry per operazioni critiche allineata alla versione Kotlin (Punto 5)
+  //Logica di retry per operazioni critiche di rete
   Future<void> _eseguiConRetry(Future<void> Function() operazione, {required VoidCallback onFallimentoDefinitivo}) async {
     int tentativi = 0;
     const maxTentativi = 2; //Riprovo una volta dopo il primo fallimento
     
     while (tentativi < maxTentativi) {
       try {
-        await operazione().timeout(const Duration(seconds: 8)); //Timeout di 8 secondi (Punto 5)
+        await operazione().timeout(const Duration(seconds: 8)); //Timeout di 8 secondi per singola richiesta
         return; //Successo
       } catch (e) {
         tentativi++;
         if (tentativi < maxTentativi) {
-          //Attesa di 10 secondi prima del prossimo tentativo (Punto 5)
+          //Attesa di 10 secondi prima del prossimo tentativo per permettere il ripristino del segnale
           await Future.delayed(const Duration(seconds: 10));
         }
       }
@@ -106,7 +106,7 @@ class UtenteViewModel extends ChangeNotifier {
 
   //gestisce la procedura di login verificando le credenziali su Firebase e salvando i dati per l'offline
   Future<void> eseguiLogin(String cfInserito, String passwordInserita, Function(bool, String) onRisultato) async {
-    //Validazione CF locale tramite regex prima di chiamare Firebase per allineamento Kotlin (Punto 3)
+    //Validazione CF locale tramite regex prima di chiamare Firebase
     final regexCF = RegExp(r"^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$");
     if (!regexCF.hasMatch(cfInserito.trim().toUpperCase())) {
       onRisultato(false, "Codice Fiscale non valido formalmente");
@@ -162,7 +162,7 @@ class UtenteViewModel extends ChangeNotifier {
       return;
     }
 
-    //Validazione dei dati tramite Record di Dart 3 (Punto 3.5)
+    //Validazione dei dati tramite Record di Dart
     final (bool successoValidazione, String msgValidazione) = validaDatiRegistrazione(nome, cognome, cf, password, eta, categoria);
     if (!successoValidazione) {
       onRisultato(false, msgValidazione);
@@ -223,7 +223,7 @@ class UtenteViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  //effettua il logout eliminando la sessione corrente sia su Firebase che in locale (Punto 2.4)
+  //effettua il logout eliminando la sessione corrente sia su Firebase che in locale
   Future<void> logout() async {
     _utenteLoggato = null;
     await userPrefs.logout();
@@ -241,7 +241,7 @@ class UtenteViewModel extends ChangeNotifier {
       return;
     }
 
-    //Controllo lunghezza minima password al cambio per allineamento Kotlin (Punto 4)
+    //Controllo lunghezza minima password durante la fase di cambio
     if (nuovaPassword.length < 6) {
       onRisultato(false, "La nuova password deve essere di almeno 6 caratteri");
       return;
@@ -279,7 +279,7 @@ class UtenteViewModel extends ChangeNotifier {
     }
   }
 
-  //effettua la validazione dei dati inseriti in fase di registrazione (Punto 3.5: uso Record)
+  //effettua la validazione dei dati inseriti in fase di registrazione tramite Record
   (bool, String) validaDatiRegistrazione(
     String nome,
     String cognome,
