@@ -19,7 +19,7 @@ class EsitiViewModel extends ChangeNotifier {
       //estrae gli identificativi univoci degli esami per caricarne i dettagli (data, luogo, tipologia)
       final ids = esiti.map((e) => e.idEsame).toList();
 
-      //se ci sono troppi esiti (oltre 10), mostriamo solo quelli grezzi per limitazioni del database
+      //se ci sono troppi esiti (oltre 10), mostriamo solo quelli grezzi
       if (ids.length > 10) {
         onRisultato(esiti, {}, false);
         return;
