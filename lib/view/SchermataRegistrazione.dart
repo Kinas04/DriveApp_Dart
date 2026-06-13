@@ -80,24 +80,36 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
-                  
+
                   TextField(
                     controller: nomeController,
-                    onChanged: (v) => nomeController.text = viewModel.formattaNome(v),
-                    decoration: InputDecoration(
-                      labelText: "Nome",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
+                    onChanged: (v) {
+                      String testoFormattato = viewModel.formattaNome(v);
+
+                      nomeController.value = TextEditingValue(
+                        text: testoFormattato,
+                        selection: TextSelection.collapsed(offset: testoFormattato.length),
+                      );
+
+                      setState(() => messaggioErrore = "");
+                    },
+                    decoration: const InputDecoration(labelText: "Nome"),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   TextField(
                     controller: cognomeController,
-                    onChanged: (v) => cognomeController.text = viewModel.formattaNome(v),
-                    decoration: InputDecoration(
-                      labelText: "Cognome",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
+                    onChanged: (v) {
+                      String testoFormattato = viewModel.formattaNome(v);
+
+                      nomeController.value = TextEditingValue(
+                        text: testoFormattato,
+                        selection: TextSelection.collapsed(offset: testoFormattato.length),
+                      );
+
+                      setState(() => messaggioErrore = "");
+                    },
+                    decoration: const InputDecoration(labelText: "Cognome"),
                   ),
                   const SizedBox(height: 16),
                   

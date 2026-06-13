@@ -16,7 +16,7 @@ class _SchermataSicurezzaState extends State<SchermataSicurezza> {
   String messaggioErrore = "";
 
   //procedura di cambio password che verifica la credenziale precedente
-  void _cambiaPassword(UtenteViewModel viewModel) async {
+  Future<void> _cambiaPassword(UtenteViewModel viewModel) async {
     setState(() {
       inCaricamento = true;
       messaggioErrore = "";

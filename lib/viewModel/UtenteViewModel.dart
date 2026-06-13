@@ -103,7 +103,6 @@ class UtenteViewModel extends ChangeNotifier {
       cognome.trim(),
       int.tryParse(eta) ?? 0,
       cf.trim().toUpperCase(),
-      password,
       categoria,
     );
 
@@ -133,7 +132,7 @@ class UtenteViewModel extends ChangeNotifier {
   }
 
   //effettua il logout eliminando la sessione corrente
-  void logout() async {
+  Future<void> logout() async {
     _utenteLoggato = null;
     await userPrefs.logout();
     await repository.signOut();
