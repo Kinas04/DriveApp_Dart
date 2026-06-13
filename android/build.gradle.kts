@@ -1,3 +1,6 @@
+import org.gradle.api.JavaVersion
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 allprojects {
     repositories {
         google()
@@ -15,8 +18,22 @@ subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
+
 subprojects {
     project.evaluationDependsOn(":app")
+}
+
+// Forza tutti i sub-progetti (plugin) a usare Java 17 con la nuova sintassi Kotlin 2.x
+subprojects {
+    tasks.withType<JavaCompile>().configureEach {
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
+    }
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {
