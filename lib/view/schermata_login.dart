@@ -123,7 +123,7 @@ class _SchermataLoginState extends State<SchermataLogin> {
     return Column(
       children: [
         const Text(
-          "Ti diamo il benvenuto su DriveAPP!",
+          "Benvenuto su DriveAPP!",
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
@@ -147,7 +147,7 @@ class _SchermataLoginState extends State<SchermataLogin> {
         ),
         const SizedBox(height: 32),
         const Text(
-          "Effettua l'accesso per gestire le tue guide:",
+          "Effettua l'accesso:",
           style: TextStyle(fontSize: 14, color: Colors.black54),
           textAlign: TextAlign.center,
         ),

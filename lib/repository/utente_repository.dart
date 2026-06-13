@@ -68,7 +68,7 @@ class UtenteRepository implements RepositoryInterface {
   }
 
   /*Definisco una serie di getter per prelevare i dati necessari da Firestore
-  Per le liste. per ogni funzione, ne uso un'altra .map per trasformare ogni documento in oggetto Dart
+  Per le liste, per ogni funzione, ne uso un'altra .map per trasformare ogni documento in oggetto Dart
   Per gli elementi singoli, verifico l'effettiva esistenza del documento prima di restituire l'oggetto mappato. */
   @override
   Future<Utente?> getUtente(String codiceFiscale) async {

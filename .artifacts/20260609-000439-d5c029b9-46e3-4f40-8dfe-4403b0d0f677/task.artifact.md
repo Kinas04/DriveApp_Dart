@@ -1,10 +1,10 @@
 # Task Management
 
-- [/] Risoluzione bug e problematiche funzionali/qualitative
-    - [ ] Refactor `UtenteViewModel` (Record, logout signature, auth check)
-    - [ ] Fix `SchermataLogin` (bug cursore, dispose, nested scroll)
-    - [ ] Fix `SchermataRegistrazione` (bug cursore, dispose, initialValue)
-    - [ ] Fix `SchermataSicurezza` (signature async, dispose)
-    - [ ] Fix `SchermataCalendario` (icone semantiche)
-    - [ ] Allineamento formattazione file (preferences, connectivity)
-    - [ ] Verifica finale funzionalità
+- [x] Risoluzione bug e problematiche funzionali/qualitative
+    - [x] Refactor `UtenteViewModel` (Record, logout signature, auth check)
+    - [x] Fix `SchermataLogin` (bug cursore, dispose, nested scroll)
+    - [x] Fix `SchermataRegistrazione` (bug cursore, dispose, initialValue)
+    - [x] Fix `SchermataSicurezza` (signature async, dispose)
+    - [x] Fix `SchermataCalendario` (icone semantiche)
+    - [x] Allineamento formattazione file (preferences, connectivity)
+    - [x] Verifica finale funzionalità
