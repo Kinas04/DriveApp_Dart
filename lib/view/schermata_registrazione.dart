@@ -104,11 +104,25 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                   TextField(
                     controller: nomeController,
                     onChanged: (v) {
+                      // salvataggio posizione cursore
+                      int posizioneCursore = nomeController.selection.base.offset;
+
+                      // formattazione testo con funzione viewmodel
                       String testoFormattato = viewModel.formattaNome(v);
+
+                      // calcolo formattazione per correzione (spazi o altro)
+                      int differenzaLunghezza = testoFormattato.length - v.length;
+                      int nuovaPosizione = posizioneCursore + differenzaLunghezza;
+
+                      // formattazione testo e riposizionamento cursore
                       nomeController.value = TextEditingValue(
                         text: testoFormattato,
-                        selection: TextSelection.collapsed(offset: testoFormattato.length),
+                        selection: TextSelection.collapsed(
+                          // evitiamo crash in posizioni non ammesse
+                          offset: nuovaPosizione.clamp(0, testoFormattato.length),
+                        ),
                       );
+
                       setState(() => messaggioErrore = "");
                     },
                     decoration: const InputDecoration(
@@ -122,11 +136,25 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                   TextField(
                     controller: cognomeController,
                     onChanged: (v) {
+                      // salvataggio posizione cursore
+                      int posizioneCursore = cognomeController.selection.base.offset;
+
+                      // formattazione testo con funzione viewmodel
                       String testoFormattato = viewModel.formattaNome(v);
+
+                      // calcolo formattazione per correzione (spazi o altro)
+                      int differenzaLunghezza = testoFormattato.length - v.length;
+                      int nuovaPosizione = posizioneCursore + differenzaLunghezza;
+
+                      // formattazione testo e riposizionamento cursore
                       cognomeController.value = TextEditingValue(
                         text: testoFormattato,
-                        selection: TextSelection.collapsed(offset: testoFormattato.length),
+                        selection: TextSelection.collapsed(
+                          // evitiamo crash in posizioni non ammesse
+                          offset: nuovaPosizione.clamp(0, testoFormattato.length),
+                        ),
                       );
+
                       setState(() => messaggioErrore = "");
                     },
                     decoration: const InputDecoration(
@@ -140,11 +168,25 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                   TextField(
                     controller: codiceController,
                     onChanged: (v) {
+                      // salvataggio posizione cursore
+                      int posizioneCursore = codiceController.selection.base.offset;
+
+                      // formattazione testo con funzione viewmodel
                       String testoFormattato = viewModel.formattaCodiceFiscale(v);
+
+                      // calcolo formattazione per correzione (spazi o altro)
+                      int differenzaLunghezza = testoFormattato.length - v.length;
+                      int nuovaPosizione = posizioneCursore + differenzaLunghezza;
+
+                      // formattazione testo e riposizionamento cursore
                       codiceController.value = TextEditingValue(
                         text: testoFormattato,
-                        selection: TextSelection.collapsed(offset: testoFormattato.length),
+                        selection: TextSelection.collapsed(
+                          // evitiamo crash in posizioni non ammesse
+                          offset: nuovaPosizione.clamp(0, testoFormattato.length),
+                        ),
                       );
+
                       setState(() => messaggioErrore = "");
                     },
                     decoration: InputDecoration(
@@ -167,7 +209,7 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                   
                   //Menu a tendina per la selezione dell'età dell'utente
                   DropdownButtonFormField<String>(
-                    value: etaSelezionata,
+                    initialValue: etaSelezionata,
                     decoration: InputDecoration(
                       labelText: "Età",
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -179,7 +221,7 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                   
                   //Selettore per la categoria di patente ministeriale richiesta
                   DropdownButtonFormField<String>(
-                    value: categoriaSelezionata,
+                    initialValue: categoriaSelezionata,
                     decoration: InputDecoration(
                       labelText: "Patente richiesta",
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),

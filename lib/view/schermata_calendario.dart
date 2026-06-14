@@ -240,7 +240,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
     }
     if (_erroreCaricamento) {
       return const Center(
-        child: Text("Errore durante il caricamento degli eventi", style: TextStyle(color: Colors.red)),
+        child: Text("Errore durante il caricamento degli eventi.", style: TextStyle(color: Colors.red)),
       );
     }
 
@@ -249,7 +249,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
     if (items.isEmpty) {
       return const Padding(
         padding: EdgeInsets.only(top: 20),
-        child: Text("Nessun evento per questa data", style: TextStyle(color: Colors.black54)),
+        child: Text("Nessun evento per questa data.", style: TextStyle(color: Colors.black54)),
       );
     }
 

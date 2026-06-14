@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import '../model/lezione.dart';
 import '../model/esame.dart';
 import '../model/slot_guida.dart';
@@ -16,14 +17,22 @@ class CalendarioViewModel extends ChangeNotifier {
       DateTime data,
       int tab,
       Function(List<Lezione>, List<Esame>, List<SlotGuida>, bool) onRisultato
-  ) async {
+      ) async {
+
+    // Controlliamo innanzitutto lo stato della connessione
+    final List<ConnectivityResult> connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult.contains(ConnectivityResult.none)) {
+      // Se non c'è connessione, restituiamo subito liste vuote e flag di errore a 'true'
+      onRisultato([], [], [], true);
+      return;
+    }
+
     try {
-      //Definisco l'intervallo temporale per la query: dalla mezzanotte del giorno selezionato...
+      //Definizione dell'intervallo temporale per la query
       final inizio = DateTime(data.year, data.month, data.day);
-      //...fino alla mezzanotte del giorno successivo per coprire l'intera giornata
       final fine = inizio.add(const Duration(days: 1));
 
-      //Prelevo le info necessarie dai vari getter della repository in base al tab (0:Lezioni, 1:Esami, 2:Guide)
+      // info necessarie dai vari getter della repository in base al tab
       if (tab == 0) {
         final lezioni = await repository.getLezioni(inizio, fine);
         onRisultato(lezioni, [], [], false);
@@ -35,7 +44,7 @@ class CalendarioViewModel extends ChangeNotifier {
         onRisultato([], [], guide, false);
       }
     } catch (e) {
-      //In caso di errore durante il recupero, restituisco liste vuote e segnalo l'errore alla UI
+      //In caso di errore durante il recupero restituisce liste vuote
       onRisultato([], [], [], true);
     }
   }

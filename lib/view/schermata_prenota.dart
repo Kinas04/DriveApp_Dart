@@ -217,33 +217,35 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
-        child: Center(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTitolo(isCompatto),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 16),
-                        _buildSelettoreTabs(),
-                        const SizedBox(height: 16),
-                        _buildSottotitolo(),
-                        const SizedBox(height: 16),
-                        //L'area del contenuto è espandibile per occupare tutto lo spazio verticale utile
-                        Expanded(child: _buildContenuto()),
-                      ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildTitolo(isCompatto),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 16),
+                    // Se siamo in landscape, limitiamo la larghezza del selettore a 400
+                    isCompatto
+                        ? _buildSelettoreTabs()
+                        : Center(
+                        child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 400),
+                            child: _buildSelettoreTabs()
+                        )
                     ),
-                  ),
+                    const SizedBox(height: 16),
+                    _buildSottotitolo(),
+                    const SizedBox(height: 16),
+                    Expanded(child: _buildContenuto()),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -302,9 +304,9 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
 
     String testo = "";
     if (_tabController.index == 0) {
-      testo = _listaEsami.isEmpty ? "Nessun esame disponibile" : "Scegli un esame da prenotare";
+      testo = _listaEsami.isEmpty ? "Nessun esame disponibile." : "Scegli un esame da prenotare:";
     } else {
-      testo = _listaGuide.isEmpty ? "Nessuna guida disponibile" : "Scegli una guida da prenotare";
+      testo = _listaGuide.isEmpty ? "Nessuna guida disponibile." : "Scegli una guida da prenotare:";
     }
 
     return Text(
@@ -322,7 +324,7 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
     if (_erroreCaricamento) {
       return Center(
         child: Text(
-          _tabController.index == 0 ? "Errore caricamento esami" : "Errore caricamento guide",
+          _tabController.index == 0 ? "Errore caricamento esami." : "Errore caricamento guide.",
           style: const TextStyle(color: Colors.red),
         ),
       );

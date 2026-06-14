@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import '../model/esame.dart';
 import '../model/slot_guida.dart';
 import '../repository/repository_interface.dart';
@@ -12,28 +13,36 @@ class PrenotaViewModel extends ChangeNotifier {
 
   //recupera la lista degli elementi (esami o guide) che l'utente può visualizzare e prenotare
   Future<void> caricaElementiPrenotabili(
-      String categoria, 
-      String cf, 
-      int tab, 
+      String categoria,
+      String cf,
+      int tab,
       Function(List<Esame>, List<SlotGuida>, Set<String>, bool) onRisultato
-  ) async {
+      ) async {
+
+    // check connessione per errore istantaneo
+    final List<ConnectivityResult> connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult.contains(ConnectivityResult.none)) {
+      onRisultato([], [], {}, true);
+      return;
+    }
+
     try {
       final adesso = DateTime.now();
-      //Tab 0: Gestione Esami
+      // tab esami
       if (tab == 0) {
         //Recupero tutti gli esami futuri per la categoria dell'utente
         final esami = await repository.getEsamiFuturi(categoria, adesso);
         //Ottengo l'elenco di quelli già prenotati per evidenziarli nella UI
         final prenotati = await repository.getPrenotazioniEsamiUtente(cf);
         onRisultato(esami, [], prenotati.toSet(), false);
-      } 
-      //Tab 1: Gestione Guide
+      }
+      // tab guide
       else {
         //Recupero tutti gli slot guida futuri filtrati per categoria
         final tutteLeGuide = await repository.getGuideFuture(categoria, adesso);
         //Filtro per mostrare solo le guide libere o quelle già prenotate dall'utente loggato
         final guideVisibili = tutteLeGuide.where((g) =>
-          g.utentePrenotato == null || g.utentePrenotato == cf
+        g.utentePrenotato == null || g.utentePrenotato == cf
         ).toList();
         //Identifico quali di queste guide sono già state prenotate dall'utente
         final prenotati = guideVisibili
@@ -50,6 +59,14 @@ class PrenotaViewModel extends ChangeNotifier {
 
   //salva la prenotazione per un esame o una guida specifica dell'utente loggato
   Future<void> prenotaElemento(int tab, String id, String cf, Function(bool, String) onRisultato) async {
+
+    // controllo preliminare connessione
+    final List<ConnectivityResult> connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult.contains(ConnectivityResult.none)) {
+      onRisultato(false, "Nessuna connessione internet. Impossibile prenotare.");
+      return;
+    }
+
     try {
       if (tab == 0) {
         //Richiamo la funzione prenotaEsame per aggiungere il record nella collezione dedicata
@@ -58,14 +75,22 @@ class PrenotaViewModel extends ChangeNotifier {
         //Aggiorno lo slot guida associandogli il codice fiscale dell'utente
         await repository.prenotaGuida(id, cf);
       }
-      onRisultato(true, "Prenotazione effettuata con successo");
+      onRisultato(true, "Prenotazione effettuata con successo.");
     } catch (e) {
-      onRisultato(false, "Errore durante la procedura di prenotazione");
+      onRisultato(false, "Errore durante la prenotazione.");
     }
   }
 
   //annulla una prenotazione esistente restituendo l'elemento allo stato disponibile
   Future<void> annullaPrenotazione(int tab, String id, String cf, Function(bool, String) onRisultato) async {
+
+    // controllo preliminare connessione
+    final List<ConnectivityResult> connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult.contains(ConnectivityResult.none)) {
+      onRisultato(false, "Nessuna connessione internet. Impossibile annullare.");
+      return;
+    }
+
     try {
       if (tab == 0) {
         //Rimuovo il record della prenotazione dell'esame dal database
@@ -74,9 +99,9 @@ class PrenotaViewModel extends ChangeNotifier {
         //Libero lo slot della guida impostando l'utente prenotato a null
         await repository.annullaGuida(id);
       }
-      onRisultato(true, "Prenotazione annullata correttamente");
+      onRisultato(true, "Prenotazione annullata con successo.");
     } catch (e) {
-      onRisultato(false, "Errore durante l'annullamento della prenotazione");
+      onRisultato(false, "Errore durante l'annullamento.");
     }
   }
 }

@@ -232,6 +232,13 @@ class UtenteViewModel extends ChangeNotifier {
 
   //procedura per cambiare la password verificando prima quella attualmente in uso
   Future<void> avviaCambioPassword(String vecchiaPassword, String nuovaPassword, Function(bool, String) onRisultato) async {
+
+    // check connessione
+    if (!await networkChecker.isInternetAvailable()) {
+      onRisultato(false, "Connessione assente. Riprova quando sei online.");
+      return;
+    }
+
     final cf = _utenteLoggato?.codiceFiscale;
     if (cf == null) return;
 
@@ -246,11 +253,13 @@ class UtenteViewModel extends ChangeNotifier {
       return;
     }
 
+    // controllo password uguali
     if (vecchiaPassword == nuovaPassword) {
       onRisultato(false, "Le password sono uguali.");
       return;
     }
 
+    // procedura di cambio con eventuali errori
     try {
       final check = await repository.eseguiLogin(cf, vecchiaPassword);
       if (check != null) {
@@ -264,14 +273,21 @@ class UtenteViewModel extends ChangeNotifier {
     }
   }
 
-  //elimina definitivamente l'account e tutti i dati correlati, poi esegue il logout locale
+  //elimina definitivamente l'account e tutti i dati correlati, poi esegue il logout
   Future<void> eliminaAccount(Function(bool, String) onRisultato) async {
+
+    // check connessione
+    if (!await networkChecker.isInternetAvailable()) {
+      onRisultato(false, "Devi essere online per eliminare l'account.");
+      return;
+    }
+
     final cf = _utenteLoggato?.codiceFiscale;
     if (cf == null) return;
 
     try {
       await repository.eliminaUtente(cf);
-      await logout(); //Uso await per garantire la pulizia prima del risultato
+      await logout(); // await serve per garantire la pulizia prima del risultato
       onRisultato(true, "Account eliminato.");
     } catch (e) {
       onRisultato(false, "Errore eliminazione account.");

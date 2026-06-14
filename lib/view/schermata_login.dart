@@ -164,12 +164,25 @@ class _SchermataLoginState extends State<SchermataLogin> {
         TextField(
           controller: codiceController,
           onChanged: (v) {
+            // salvataggio posizione cursore
+            int posizioneCursore = codiceController.selection.base.offset;
+
+            // formattazione testo con funzione viewmodel
             String testoFormattato = viewModel.formattaCodiceFiscale(v);
-            //Mantengo la posizione del cursore per una migliore esperienza utente
+
+            // calcolo formattazione per correzione (spazi o altro)
+            int differenzaLunghezza = testoFormattato.length - v.length;
+            int nuovaPosizione = posizioneCursore + differenzaLunghezza;
+
+            // formattazione testo e riposizionamento cursore
             codiceController.value = TextEditingValue(
               text: testoFormattato,
-              selection: TextSelection.collapsed(offset: testoFormattato.length),
+              selection: TextSelection.collapsed(
+                // evitiamo crash in posizioni non ammesse
+                offset: nuovaPosizione.clamp(0, testoFormattato.length),
+              ),
             );
+
             setState(() => messaggioErrore = "");
           },
           decoration: InputDecoration(

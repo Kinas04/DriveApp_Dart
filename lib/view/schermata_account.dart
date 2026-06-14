@@ -8,8 +8,6 @@ class SchermataAccount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /*otteniamo l'istanza del ViewModel per accedere ai dati dell'utente loggato
-    Fondamentale ogni volta è passare il contesto!!*/
     final viewModel = Provider.of<UtenteViewModel>(context);
     final utente = viewModel.utenteLoggato;
 
@@ -20,7 +18,7 @@ class SchermataAccount extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //Titolo allineato verticalmente con le altre sezioni dell'app
+              // titolo schermata
               const Padding(
                 padding: EdgeInsets.fromLTRB(16, 24, 16, 16),
                 child: Text(
@@ -28,71 +26,62 @@ class SchermataAccount extends StatelessWidget {
                   style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 8),
-                    Center(
-                      child: Column(
-                        children: [
-                          const CircleAvatar(
-                            radius: 50,
-                            //Qua uso l'icona standard di sistema per la foto profilo
-                            child: Icon(Icons.person, size: 50),
-                          ),
-                          const SizedBox(height: 20),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  utente != null ? "${utente.nome} ${utente.cognome}" : "Nome Cognome",
-                                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+
+              // contenuto centrato
+              Center(
+                child: ConstrainedBox(
+                  // 600 limite di larghezza per schermi grandi
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 8),
+                        const CircleAvatar(
+                          radius: 50,
+                          child: Icon(Icons.person, size: 50),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          utente != null ? "${utente.nome} ${utente.cognome}" : "Nome Cognome",
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 32),
+                        const Divider(height: 1),
+                        ListTile(
+                          title: const Text("Sicurezza ed accesso", style: TextStyle(fontWeight: FontWeight.w500)),
+                          subtitle: const Text("Modifica password, elimina account"),
+                          trailing: const Icon(Icons.arrow_right, color: Colors.black54),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const SchermataSicurezza()),
+                            );
+                          },
+                        ),
+                        const Divider(height: 1),
+                        ListTile(
+                          title: const Text("Informazioni sull'app", style: TextStyle(fontWeight: FontWeight.w500)),
+                          subtitle: const Text("Contatti, supporto, info legali"),
+                          trailing: const Icon(Icons.arrow_right, color: Colors.black54),
+                          onTap: () {
+                            _mostraInfoApp(context);
+                          },
+                        ),
+                        const Divider(height: 1),
+                        ListTile(
+                          title: const Text("Esci dall'account", style: TextStyle(fontWeight: FontWeight.w500, color: Colors.redAccent)),
+                          subtitle: const Text("Disconnessione dall'app"),
+                          trailing: const Icon(Icons.arrow_right, color: Colors.black54),
+                          onTap: () {
+                            _mostraConfermaLogout(context, viewModel);
+                          },
+                        ),
+                        const Divider(height: 1),
+                      ],
                     ),
-                    const SizedBox(height: 32),
-                    const Divider(height: 1),
-                    //collega la schermata per la gestione della password e cancellazione account
-                    ListTile(
-                      title: const Text("Sicurezza ed accesso", style: TextStyle(fontWeight: FontWeight.w500)),
-                      subtitle: const Text("Modifica password, elimina account"),
-                      trailing: const Icon(Icons.arrow_right, color: Colors.black54),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const SchermataSicurezza()),
-                        );
-                      },
-                    ),
-                    const Divider(height: 1),
-                    //mostra le informazioni legali e i crediti dell'applicazione
-                    ListTile(
-                      title: const Text("Informazioni sull'app", style: TextStyle(fontWeight: FontWeight.w500)),
-                      subtitle: const Text("Contatti, supporto, info legali"),
-                      trailing: const Icon(Icons.arrow_right, color: Colors.black54),
-                      onTap: () {
-                        _mostraInfoApp(context);
-                      },
-                    ),
-                    const Divider(height: 1),
-                    //effettua il logout pulendo le preferenze locali e la sessione Firebase
-                    ListTile(
-                      title: const Text("Esci dall'account", style: TextStyle(fontWeight: FontWeight.w500, color: Colors.redAccent)),
-                      subtitle: const Text("Disconnessione dall'app"),
-                      trailing: const Icon(Icons.arrow_right, color: Colors.black54),
-                      onTap: () {
-                        _mostraConfermaLogout(context, viewModel);
-                      },
-                    ),
-                    const Divider(height: 1),
-                  ],
+                  ),
                 ),
               ),
             ],

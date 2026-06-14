@@ -65,9 +65,9 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start, // allineato a sx
           children: [
-            //Titolo della sezione con padding dedicato
+            // Titolo della pagina
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 24, 16, 16),
               child: Text(
@@ -75,8 +75,15 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               ),
             ),
-            //Il contenuto della lista occupa tutto lo spazio rimanente
-            Expanded(child: _buildContenuto()),
+            // limite larghezza per schermi grandi
+            Expanded(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: _buildContenuto(),
+                ),
+              ),
+            ),
           ],
         ),
       ),
