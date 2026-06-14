@@ -36,7 +36,7 @@ class _SchermataLoginState extends State<SchermataLogin> {
       messaggioErrore = "";
     });
 
-    //Inviio i dati al ViewModel per la verifica su Firebase
+    //Invio i dati al ViewModel per la verifica su Firebase
     await viewModel.eseguiLogin(
       codiceController.text.trim(),
       passwordController.text.trim(),

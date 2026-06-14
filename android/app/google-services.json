@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:50112590303:android:1e04726d7304c2f006d46a",
+        "android_client_info": {
+          "package_name": "com.decigonzy.driveapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgArS56jH187H6AmgKy5GAsSNhcJEabSQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:50112590303:android:4d180037c5a63c6b06d46a",
         "android_client_info": {
           "package_name": "com.example.driveapp"
