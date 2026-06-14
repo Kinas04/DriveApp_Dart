@@ -18,7 +18,8 @@ class UtenteRepository implements RepositoryInterface {
   Future<Utente?> eseguiLogin(String codiceFiscale, String password) async {
     //Genero una mail fittizia basata sul codice fiscale per l'autenticazione Firebase
     final String email = "${codiceFiscale.toLowerCase()}@driveapp.it";
-    final credenziali = await auth.signInWithEmailAndPassword(email: email, password: password);
+    final credenziali =
+        await auth.signInWithEmailAndPassword(email: email, password: password);
     if (credenziali.user != null) {
       //Se il login ha successo, recupero i dati anagrafici completi da Firestore
       return getUtente(codiceFiscale);
@@ -51,11 +52,11 @@ class UtenteRepository implements RepositoryInterface {
           .collection("utenti")
           .doc(utente.codiceFiscale)
           .set(utente.toFirestore());
-
     } on FirebaseAuthException catch (e) {
       //Gestisco il caso specifico in cui l'utente stia provando a registrarsi con un CF già esistente
       if (e.code == 'email-already-in-use') {
-        throw Exception("Il Codice Fiscale inserito è già associato a un account.");
+        throw Exception(
+            "Il Codice Fiscale inserito è già associato a un account.");
       }
       rethrow;
     } catch (e) {
@@ -82,7 +83,8 @@ class UtenteRepository implements RepositoryInterface {
   //recupera le lezioni di teoria dal database filtrandole per data
   @override
   Future<List<Lezione>> getLezioni(DateTime inizio, DateTime fine) async {
-    final query = await firestore.collection("lezioni")
+    final query = await firestore
+        .collection("lezioni")
         .where("dataLezione", isGreaterThanOrEqualTo: inizio)
         .where("dataLezione", isLessThanOrEqualTo: fine)
         .get();
@@ -92,7 +94,8 @@ class UtenteRepository implements RepositoryInterface {
   //preleva gli appelli d'esame filtrati per l'intervallo temporale selezionato
   @override
   Future<List<Esame>> getEsami(DateTime inizio, DateTime fine) async {
-    final query = await firestore.collection("esami")
+    final query = await firestore
+        .collection("esami")
         .where("data", isGreaterThanOrEqualTo: inizio)
         .where("data", isLessThanOrEqualTo: fine)
         .get();
@@ -102,7 +105,8 @@ class UtenteRepository implements RepositoryInterface {
   //ottiene gli slot di guida pratica per un determinato periodo
   @override
   Future<List<SlotGuida>> getGuide(DateTime inizio, DateTime fine) async {
-    final query = await firestore.collection("slot_guide")
+    final query = await firestore
+        .collection("slot_guide")
         .where("data", isGreaterThanOrEqualTo: inizio)
         .where("data", isLessThanOrEqualTo: fine)
         .get();
@@ -112,10 +116,13 @@ class UtenteRepository implements RepositoryInterface {
   //recupera lo storico degli esiti degli esami per lo specifico utente loggato
   @override
   Future<List<EsitoEsame>> getEsiti(String codiceFiscale) async {
-    final query = await firestore.collection("esiti_esami")
+    final query = await firestore
+        .collection("esiti_esami")
         .where("codiceFiscale", isEqualTo: codiceFiscale)
         .get();
-    return query.docs.map((doc) => EsitoEsame.fromFirestore(doc, null)).toList();
+    return query.docs
+        .map((doc) => EsitoEsame.fromFirestore(doc, null))
+        .toList();
   }
 
   //restituisce i dettagli di un set di esami partendo dai loro identificativi
@@ -123,7 +130,8 @@ class UtenteRepository implements RepositoryInterface {
   Future<List<Esame>> getEsamiPerId(List<String> ids) async {
     if (ids.isEmpty) return [];
     //Filtro sul campo 'idEsame' all'interno del documento per recuperare gli appelli specifici
-    final query = await firestore.collection("esami")
+    final query = await firestore
+        .collection("esami")
         .where("idEsame", whereIn: ids)
         .get();
     return query.docs.map((doc) => Esame.fromFirestore(doc, null)).toList();
@@ -133,10 +141,11 @@ class UtenteRepository implements RepositoryInterface {
   @override
   Future<List<Esame>> getEsamiFuturi(String categoria, DateTime data) async {
     //Filtro prima per categoria su Firestore per ottimizzare il download dei dati
-    final query = await firestore.collection("esami")
+    final query = await firestore
+        .collection("esami")
         .where("categoriaPatente", isEqualTo: categoria)
         .get();
-    
+
     //Successivamente filtro per data in memoria per raffinare i risultati
     return query.docs
         .map((doc) => Esame.fromFirestore(doc, null))
@@ -147,7 +156,8 @@ class UtenteRepository implements RepositoryInterface {
   //restituisce gli ID degli esami già prenotati dall'utente per gestire lo stato della UI
   @override
   Future<List<String>> getPrenotazioniEsamiUtente(String codiceFiscale) async {
-    final query = await firestore.collection("prenotazioni_esami")
+    final query = await firestore
+        .collection("prenotazioni_esami")
         .where("codiceFiscale", isEqualTo: codiceFiscale)
         .get();
     return query.docs.map((doc) => doc.data()["idEsame"] as String).toList();
@@ -155,12 +165,14 @@ class UtenteRepository implements RepositoryInterface {
 
   //recupera gli slot guida futuri filtrando per categoria di patente
   @override
-  Future<List<SlotGuida>> getGuideFuture(String categoria, DateTime data) async {
+  Future<List<SlotGuida>> getGuideFuture(
+      String categoria, DateTime data) async {
     //Filtro prima per categoria su Firestore per maggiore efficienza nella query
-    final query = await firestore.collection("slot_guide")
+    final query = await firestore
+        .collection("slot_guide")
         .where("categoriaPatente", isEqualTo: categoria)
         .get();
-    
+
     //Filtro temporale eseguito in locale post-query
     return query.docs
         .map((doc) => SlotGuida.fromFirestore(doc, null))
@@ -171,7 +183,10 @@ class UtenteRepository implements RepositoryInterface {
   //Funzione per permettere all'Utente di prenotare un esame salvando il record sul DB
   @override
   Future<void> prenotaEsame(String idEsame, String codiceFiscale) async {
-    await firestore.collection("prenotazioni_esami").doc("${idEsame}_$codiceFiscale").set({
+    await firestore
+        .collection("prenotazioni_esami")
+        .doc("${idEsame}_$codiceFiscale")
+        .set({
       "idEsame": idEsame,
       "codiceFiscale": codiceFiscale,
     });
@@ -188,7 +203,10 @@ class UtenteRepository implements RepositoryInterface {
   //Rimuove la prenotazione dell'esame dal database per l'utente specifico
   @override
   Future<void> annullaEsame(String idEsame, String codiceFiscale) async {
-    await firestore.collection("prenotazioni_esami").doc("${idEsame}_$codiceFiscale").delete();
+    await firestore
+        .collection("prenotazioni_esami")
+        .doc("${idEsame}_$codiceFiscale")
+        .delete();
   }
 
   //Annulla la prenotazione della guida liberando lo slot (imposta l'utente a null)
@@ -208,7 +226,6 @@ class UtenteRepository implements RepositoryInterface {
   //elimina definitivamente l'account e pulisce a cascata tutti i dati associati (esiti, guide, prenotazioni)
   @override
   Future<void> eliminaUtente(String codiceFiscale) async {
-
     //Utilizzo una funzione batch per eseguire scritture multiple in un'unica operazione atomica
     final batch = firestore.batch();
 

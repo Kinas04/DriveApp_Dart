@@ -43,37 +43,52 @@ class SchermataAccount extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          utente != null ? "${utente.nome} ${utente.cognome}" : "Nome Cognome",
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          utente != null
+                              ? "${utente.nome} ${utente.cognome}"
+                              : "Nome Cognome",
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 32),
                         const Divider(height: 1),
                         ListTile(
-                          title: const Text("Sicurezza ed accesso", style: TextStyle(fontWeight: FontWeight.w500)),
-                          subtitle: const Text("Modifica password, elimina account"),
-                          trailing: const Icon(Icons.arrow_right, color: Colors.black54),
+                          title: const Text("Sicurezza ed accesso",
+                              style: TextStyle(fontWeight: FontWeight.w500)),
+                          subtitle:
+                              const Text("Modifica password, elimina account"),
+                          trailing: const Icon(Icons.arrow_right,
+                              color: Colors.black54),
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const SchermataSicurezza()),
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const SchermataSicurezza()),
                             );
                           },
                         ),
                         const Divider(height: 1),
                         ListTile(
-                          title: const Text("Informazioni sull'app", style: TextStyle(fontWeight: FontWeight.w500)),
-                          subtitle: const Text("Contatti, supporto, info legali"),
-                          trailing: const Icon(Icons.arrow_right, color: Colors.black54),
+                          title: const Text("Informazioni sull'app",
+                              style: TextStyle(fontWeight: FontWeight.w500)),
+                          subtitle:
+                              const Text("Contatti, supporto, info legali"),
+                          trailing: const Icon(Icons.arrow_right,
+                              color: Colors.black54),
                           onTap: () {
                             _mostraInfoApp(context);
                           },
                         ),
                         const Divider(height: 1),
                         ListTile(
-                          title: const Text("Esci dall'account", style: TextStyle(fontWeight: FontWeight.w500, color: Colors.redAccent)),
+                          title: const Text("Esci dall'account",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.redAccent)),
                           subtitle: const Text("Disconnessione dall'app"),
-                          trailing: const Icon(Icons.arrow_right, color: Colors.black54),
+                          trailing: const Icon(Icons.arrow_right,
+                              color: Colors.black54),
                           onTap: () {
                             _mostraConfermaLogout(context, viewModel);
                           },
@@ -102,10 +117,12 @@ class SchermataAccount extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Drive App", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              Text("Drive App",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               Text("Versione 1.0.0"),
               SizedBox(height: 16),
-              Text("Programmazione Mobile A.A 2025/2026", style: TextStyle(fontWeight: FontWeight.w500)),
+              Text("Programmazione Mobile A.A 2025/2026",
+                  style: TextStyle(fontWeight: FontWeight.w500)),
               Text("Gonzato Cristian, De Cinque Nicola Giorgio"),
               SizedBox(height: 16),
               Text("© 2026 Drive App Team"),

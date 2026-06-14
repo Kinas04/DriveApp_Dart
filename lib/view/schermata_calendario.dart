@@ -38,7 +38,7 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
   //chiamata al ViewModel per recuperare gli eventi dal database in base a data e tab attivo
   Future<void> _caricaEventi() async {
     final viewModel = Provider.of<CalendarioViewModel>(context, listen: false);
-    
+
     setState(() {
       _inCaricamento = true;
       _erroreCaricamento = false;
@@ -183,8 +183,11 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
               child: Container(
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: isSelezionato 
-                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5) 
+                  color: isSelezionato
+                      ? Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.5)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(24),
                 ),
@@ -240,16 +243,20 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
     }
     if (_erroreCaricamento) {
       return const Center(
-        child: Text("Errore durante il caricamento degli eventi.", style: TextStyle(color: Colors.red)),
+        child: Text("Errore durante il caricamento degli eventi.",
+            style: TextStyle(color: Colors.red)),
       );
     }
 
-    final List items = _tabSelezionato == 0 ? _lezioni : (_tabSelezionato == 1 ? _esami : _guide);
+    final List items = _tabSelezionato == 0
+        ? _lezioni
+        : (_tabSelezionato == 1 ? _esami : _guide);
 
     if (items.isEmpty) {
       return const Padding(
         padding: EdgeInsets.only(top: 20),
-        child: Text("Nessun evento per questa data.", style: TextStyle(color: Colors.black54)),
+        child: Text("Nessun evento per questa data.",
+            style: TextStyle(color: Colors.black54)),
       );
     }
 
@@ -263,24 +270,25 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
         //Passaggio di icone semantiche in base al tipo di evento selezionato
         if (item is Lezione) {
           return _buildEventoItem(
-            "${item.oraInizio} - ${item.oraFine}", 
-            item.argomento, 
-            item.aula, 
+            "${item.oraInizio} - ${item.oraFine}",
+            item.argomento,
+            item.aula,
             Icons.school, //Icona specifica per lezioni di teoria
           );
         } else if (item is Esame) {
           return _buildEventoItem(
-            "${item.oraInizio} - ${item.oraFine}", 
-            "Esame ${item.tipologia} (Cat. ${item.categoriaPatente})", 
-            item.luogo, 
+            "${item.oraInizio} - ${item.oraFine}",
+            "Esame ${item.tipologia} (Cat. ${item.categoriaPatente})",
+            item.luogo,
             Icons.assignment_turned_in, //Icona specifica per appelli d'esame
           );
         } else if (item is SlotGuida) {
-          final stato = item.utentePrenotato == null ? "Disponibile" : "Prenotata";
+          final stato =
+              item.utentePrenotato == null ? "Disponibile" : "Prenotata";
           return _buildEventoItem(
-            "${item.oraInizio} - ${item.oraFine}", 
-            "Guida Categoria ${item.categoriaPatente}", 
-            "${item.istruttore} - $stato", 
+            "${item.oraInizio} - ${item.oraFine}",
+            "Guida Categoria ${item.categoriaPatente}",
+            "${item.istruttore} - $stato",
             Icons.directions_car, //Icona specifica per lezioni di guida
           );
         }
@@ -290,7 +298,8 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
   }
 
   //costruisce il singolo elemento visivo della lista con icona, orario e descrizioni
-  Widget _buildEventoItem(String ora, String titolo, String sottotitolo, IconData icona) {
+  Widget _buildEventoItem(
+      String ora, String titolo, String sottotitolo, IconData icona) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -301,11 +310,15 @@ class _SchermataCalendarioState extends State<SchermataCalendario> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(ora, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+              Text(ora,
+                  style: const TextStyle(fontSize: 12, color: Colors.black54)),
               const SizedBox(height: 2),
-              Text(titolo, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              Text(titolo,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w500)),
               const SizedBox(height: 2),
-              Text(sottotitolo, style: const TextStyle(fontSize: 14, color: Colors.black54)),
+              Text(sottotitolo,
+                  style: const TextStyle(fontSize: 14, color: Colors.black54)),
             ],
           ),
         ),

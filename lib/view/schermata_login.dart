@@ -73,7 +73,9 @@ class _SchermataLoginState extends State<SchermataLogin> {
         child: Center(
           //Uso SingleChildScrollView per prevenire overflow grafici quando la tastiera è aperta
           child: SingleChildScrollView(
-            child: isCompatto ? _buildLayoutCompatto(viewModel) : _buildLayoutTablet(viewModel),
+            child: isCompatto
+                ? _buildLayoutCompatto(viewModel)
+                : _buildLayoutTablet(viewModel),
           ),
         ),
       ),
@@ -222,19 +224,22 @@ class _SchermataLoginState extends State<SchermataLogin> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.secondary,
               foregroundColor: Theme.of(context).colorScheme.onSecondary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
             ),
             child: inCaricamento
                 ? const SizedBox(
                     height: 24,
                     width: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: Colors.white),
                   )
                 : const Text("ACCEDI", style: TextStyle(fontSize: 16)),
           ),
         ),
         const SizedBox(height: 24),
-        const Text("Non hai ancora un account?", style: TextStyle(fontSize: 14)),
+        const Text("Non hai ancora un account?",
+            style: TextStyle(fontSize: 14)),
         const SizedBox(height: 8),
         //Pulsante per navigare verso la creazione di un nuovo profilo
         SizedBox(
@@ -245,10 +250,14 @@ class _SchermataLoginState extends State<SchermataLogin> {
             icon: const Icon(Icons.add),
             label: const Text("REGISTRATI", style: TextStyle(fontSize: 16)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.4),
+              backgroundColor: Theme.of(context)
+                  .colorScheme
+                  .secondary
+                  .withValues(alpha: 0.4),
               foregroundColor: Theme.of(context).colorScheme.onSurface,
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
             ),
           ),
         ),

@@ -8,19 +8,19 @@ import '../model/esito_esame.dart';
 abstract class RepositoryInterface {
   //verifica le credenziali e restituisce l'utente se il login ha successo
   Future<Utente?> eseguiLogin(String codiceFiscale, String password);
-  
+
   //crea un nuovo profilo utente sia su Firebase Authentication che su Firestore
   Future<void> registraUtente(Utente utente, String password);
-  
+
   //preleva i dati anagrafici completi di un singolo utente dal database
   Future<Utente?> getUtente(String codiceFiscale);
 
   //restituisce la lista delle lezioni di teoria comprese in un intervallo di date
   Future<List<Lezione>> getLezioni(DateTime inizio, DateTime fine);
-  
+
   //restituisce la lista degli appelli d'esame compresi in un intervallo di date
   Future<List<Esame>> getEsami(DateTime inizio, DateTime fine);
-  
+
   //restituisce tutti gli slot guida disponibili (o già occupati) in un intervallo di date
   Future<List<SlotGuida>> getGuide(DateTime inizio, DateTime fine);
 

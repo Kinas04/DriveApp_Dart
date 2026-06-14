@@ -18,7 +18,7 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
   //Liste locali per memorizzare gli esiti e i dettagli degli esami associati
   List<EsitoEsame> _esiti = [];
   Map<String, Esame> _dettagliEsami = {};
-  
+
   bool _inCaricamento = true;
   bool _erroreCaricamento = false;
 
@@ -34,9 +34,10 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
   /*chiamata al ViewModel per recuperare lo storico degli esiti dell'utente.
   La logica prevede il recupero degli esiti e successivamente dei dettagli di ogni esame coinvolto*/
   Future<void> _caricaDati() async {
-    final utenteViewModel = Provider.of<UtenteViewModel>(context, listen: false);
+    final utenteViewModel =
+        Provider.of<UtenteViewModel>(context, listen: false);
     final esitiViewModel = Provider.of<EsitiViewModel>(context, listen: false);
-    
+
     final cf = utenteViewModel.utenteLoggato?.codiceFiscale;
     if (cf == null) return;
 
@@ -101,9 +102,11 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text("Errore durante il caricamento degli esiti", style: TextStyle(color: Colors.red)),
+            const Text("Errore durante il caricamento degli esiti",
+                style: TextStyle(color: Colors.red)),
             const SizedBox(height: 16),
-            ElevatedButton(onPressed: _caricaDati, child: const Text("RIPROVA")),
+            ElevatedButton(
+                onPressed: _caricaDati, child: const Text("RIPROVA")),
           ],
         ),
       );
@@ -112,7 +115,8 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
     //Messaggio mostrato se l'utente non ha ancora sostenuto alcun esame
     if (_esiti.isEmpty) {
       return const Center(
-        child: Text("Nessun esito disponibile", style: TextStyle(color: Colors.black54)),
+        child: Text("Nessun esito disponibile",
+            style: TextStyle(color: Colors.black54)),
       );
     }
 
@@ -124,13 +128,14 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
       itemBuilder: (context, index) {
         final esito = _esiti[index];
         final esame = _dettagliEsami[esito.idEsame];
-        
+
         //Determiniamo se l'utente è stato idoneo per scegliere l'icona e il colore della card
-        final isPromosso = esito.esito.toLowerCase() == "idoneo" || esito.esito.toLowerCase() == "promosso";
-        
+        final isPromosso = esito.esito.toLowerCase() == "idoneo" ||
+            esito.esito.toLowerCase() == "promosso";
+
         final formatData = DateFormat('EEE d MMM', 'it_IT');
-        final stringaDataLuogo = esame != null 
-            ? "${formatData.format(esame.data)}, ${esame.luogo}" 
+        final stringaDataLuogo = esame != null
+            ? "${formatData.format(esame.data)}, ${esame.luogo}"
             : "Data non disponibile";
 
         //Costruiamo la card grafica per il singolo esito
@@ -138,7 +143,8 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
           context,
           isPromosso: isPromosso,
           titolo: esito.esito.toUpperCase(),
-          esame: esame != null ? "Esame ${esame.tipologia}" : "Esame sconosciuto",
+          esame:
+              esame != null ? "Esame ${esame.tipologia}" : "Esame sconosciuto",
           patente: esame != null ? "Patente ${esame.categoriaPatente}" : "",
           dataLuogo: stringaDataLuogo,
           color: isPromosso ? const Color(0xFFDEE1F3) : const Color(0xFFF9F1F7),
@@ -153,7 +159,8 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
   }
 
   //mostra un popup (Dialog) con le informazioni dettagliate dell'appello d'esame selezionato
-  void _mostraDettagliEsame(BuildContext context, EsitoEsame esito, Esame esame) {
+  void _mostraDettagliEsame(
+      BuildContext context, EsitoEsame esito, Esame esame) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -173,8 +180,10 @@ class _SchermataEsitiState extends State<SchermataEsiti> {
                 "ESITO: ${esito.esito.toUpperCase()}",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: (esito.esito.toLowerCase() == "idoneo" || esito.esito.toLowerCase() == "promosso")
-                      ? Colors.green : Colors.red,
+                  color: (esito.esito.toLowerCase() == "idoneo" ||
+                          esito.esito.toLowerCase() == "promosso")
+                      ? Colors.green
+                      : Colors.red,
                 ),
               ),
             ],

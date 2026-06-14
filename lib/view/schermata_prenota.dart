@@ -17,7 +17,6 @@ class SchermataPrenota extends StatefulWidget {
 }
 
 class _SchermataPrenotaState extends State<SchermataPrenota> {
-
   // variabile per tab selezionata
   int _tabSelezionato = 0;
 
@@ -46,8 +45,10 @@ class _SchermataPrenotaState extends State<SchermataPrenota> {
 
   //chiamata al ViewModel per caricare le liste degli elementi prenotabili filtrati per l'utente loggato
   Future<void> _caricaDati() async {
-    final utenteViewModel = Provider.of<UtenteViewModel>(context, listen: false);
-    final prenotaViewModel = Provider.of<PrenotaViewModel>(context, listen: false);
+    final utenteViewModel =
+        Provider.of<UtenteViewModel>(context, listen: false);
+    final prenotaViewModel =
+        Provider.of<PrenotaViewModel>(context, listen: false);
 
     final utente = utenteViewModel.utenteLoggato;
     if (utente == null) return;
@@ -63,7 +64,7 @@ class _SchermataPrenotaState extends State<SchermataPrenota> {
       utente.categoriaRichiesta,
       utente.codiceFiscale,
       _tabSelezionato,
-          (esami, guide, prenotati, errore) {
+      (esami, guide, prenotati, errore) {
         //controllo mounted per evitare errori se l'utente cambia pagina durante il caricamento
         if (mounted) {
           setState(() {
@@ -87,42 +88,53 @@ class _SchermataPrenotaState extends State<SchermataPrenota> {
         builder: (context, setDialogState) {
           return AlertDialog(
             title: const Text("Conferma Prenotazione"),
-            content: const Text("Vuoi confermare la prenotazione per questo elemento?"),
+            content: const Text(
+                "Vuoi confermare la prenotazione per questo elemento?"),
             actions: [
               TextButton(
-                onPressed: _inPrenotazione ? null : () => Navigator.pop(context),
+                onPressed:
+                    _inPrenotazione ? null : () => Navigator.pop(context),
                 child: const Text("ANNULLA"),
               ),
               TextButton(
-                onPressed: _inPrenotazione ? null : () async {
-                  setDialogState(() => _inPrenotazione = true);
+                onPressed: _inPrenotazione
+                    ? null
+                    : () async {
+                        setDialogState(() => _inPrenotazione = true);
 
-                  final utenteViewModel = Provider.of<UtenteViewModel>(context, listen: false);
-                  final prenotaViewModel = Provider.of<PrenotaViewModel>(context, listen: false);
+                        final utenteViewModel = Provider.of<UtenteViewModel>(
+                            context,
+                            listen: false);
+                        final prenotaViewModel = Provider.of<PrenotaViewModel>(
+                            context,
+                            listen: false);
 
-                  final cf = utenteViewModel.utenteLoggato?.codiceFiscale;
-                  if (cf == null) return;
+                        final cf = utenteViewModel.utenteLoggato?.codiceFiscale;
+                        if (cf == null) return;
 
-                  await prenotaViewModel.prenotaElemento(
-                    _tabSelezionato,
-                    id,
-                    cf,
-                        (successo, messaggio) {
-                      if (mounted) {
-                        setDialogState(() => _inPrenotazione = false);
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(messaggio)),
+                        await prenotaViewModel.prenotaElemento(
+                          _tabSelezionato,
+                          id,
+                          cf,
+                          (successo, messaggio) {
+                            if (mounted) {
+                              setDialogState(() => _inPrenotazione = false);
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(messaggio)),
+                              );
+                              if (successo) {
+                                _caricaDati();
+                              }
+                            }
+                          },
                         );
-                        if (successo) {
-                          _caricaDati();
-                        }
-                      }
-                    },
-                  );
-                },
+                      },
                 child: _inPrenotazione
-                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2))
                     : const Text("CONFERMA"),
               ),
             ],
@@ -141,42 +153,53 @@ class _SchermataPrenotaState extends State<SchermataPrenota> {
         builder: (context, setDialogState) {
           return AlertDialog(
             title: const Text("Annulla Prenotazione"),
-            content: const Text("Vuoi davvero annullare la prenotazione per questo elemento?"),
+            content: const Text(
+                "Vuoi davvero annullare la prenotazione per questo elemento?"),
             actions: [
               TextButton(
-                onPressed: _inPrenotazione ? null : () => Navigator.pop(context),
+                onPressed:
+                    _inPrenotazione ? null : () => Navigator.pop(context),
                 child: const Text("NO"),
               ),
               TextButton(
-                onPressed: _inPrenotazione ? null : () async {
-                  setDialogState(() => _inPrenotazione = true);
+                onPressed: _inPrenotazione
+                    ? null
+                    : () async {
+                        setDialogState(() => _inPrenotazione = true);
 
-                  final utenteViewModel = Provider.of<UtenteViewModel>(context, listen: false);
-                  final prenotaViewModel = Provider.of<PrenotaViewModel>(context, listen: false);
+                        final utenteViewModel = Provider.of<UtenteViewModel>(
+                            context,
+                            listen: false);
+                        final prenotaViewModel = Provider.of<PrenotaViewModel>(
+                            context,
+                            listen: false);
 
-                  final cf = utenteViewModel.utenteLoggato?.codiceFiscale;
-                  if (cf == null) return;
+                        final cf = utenteViewModel.utenteLoggato?.codiceFiscale;
+                        if (cf == null) return;
 
-                  await prenotaViewModel.annullaPrenotazione(
-                    _tabSelezionato,
-                    id,
-                    cf,
-                        (successo, messaggio) {
-                      if (mounted) {
-                        setDialogState(() => _inPrenotazione = false);
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(messaggio)),
+                        await prenotaViewModel.annullaPrenotazione(
+                          _tabSelezionato,
+                          id,
+                          cf,
+                          (successo, messaggio) {
+                            if (mounted) {
+                              setDialogState(() => _inPrenotazione = false);
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(messaggio)),
+                              );
+                              if (successo) {
+                                _caricaDati();
+                              }
+                            }
+                          },
                         );
-                        if (successo) {
-                          _caricaDati();
-                        }
-                      }
-                    },
-                  );
-                },
+                      },
                 child: _inPrenotazione
-                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2))
                     : const Text("SÌ, ANNULLA"),
               ),
             ],
@@ -208,11 +231,10 @@ class _SchermataPrenotaState extends State<SchermataPrenota> {
                     isCompatto
                         ? _buildSelettoreTabs()
                         : Center(
-                        child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 400),
-                            child: _buildSelettoreTabs()
-                        )
-                    ),
+                            child: ConstrainedBox(
+                                constraints:
+                                    const BoxConstraints(maxWidth: 400),
+                                child: _buildSelettoreTabs())),
                     const SizedBox(height: 16),
                     _buildSottotitolo(),
                     const SizedBox(height: 16),
@@ -270,7 +292,10 @@ class _SchermataPrenotaState extends State<SchermataPrenota> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: isSelezionato
-                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)
+                      ? Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.5)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(24),
                 ),
@@ -278,7 +303,9 @@ class _SchermataPrenotaState extends State<SchermataPrenota> {
                   tabs[index],
                   style: TextStyle(
                     // Colore del testo adattato al tema quando non è selezionato
-                    color: isSelezionato ? Colors.white : Theme.of(context).colorScheme.onSurface,
+                    color: isSelezionato
+                        ? Colors.white
+                        : Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -295,14 +322,19 @@ class _SchermataPrenotaState extends State<SchermataPrenota> {
 
     String testo = "";
     if (_tabSelezionato == 0) {
-      testo = _listaEsami.isEmpty ? "Nessun esame disponibile." : "Scegli un esame da prenotare:";
+      testo = _listaEsami.isEmpty
+          ? "Nessun esame disponibile."
+          : "Scegli un esame da prenotare:";
     } else {
-      testo = _listaGuide.isEmpty ? "Nessuna guida disponibile." : "Scegli una guida da prenotare:";
+      testo = _listaGuide.isEmpty
+          ? "Nessuna guida disponibile."
+          : "Scegli una guida da prenotare:";
     }
 
     return Text(
       testo,
-      style: TextStyle(fontSize: 16, color: Colors.black.withValues(alpha: 0.8)),
+      style:
+          TextStyle(fontSize: 16, color: Colors.black.withValues(alpha: 0.8)),
     );
   }
 
@@ -314,7 +346,9 @@ class _SchermataPrenotaState extends State<SchermataPrenota> {
     if (_erroreCaricamento) {
       return Center(
         child: Text(
-          _tabSelezionato == 0 ? "Errore caricamento esami." : "Errore caricamento guide.",
+          _tabSelezionato == 0
+              ? "Errore caricamento esami."
+              : "Errore caricamento guide.",
           style: const TextStyle(color: Colors.red),
         ),
       );
@@ -361,7 +395,8 @@ class _SchermataPrenotaState extends State<SchermataPrenota> {
     final IconData iconaStato = isPrenotato ? Icons.check : Icons.access_time;
 
     return InkWell(
-      onTap: () => isPrenotato ? _mostraPopupAnnulla(id) : _mostraPopupConferma(id),
+      onTap: () =>
+          isPrenotato ? _mostraPopupAnnulla(id) : _mostraPopupConferma(id),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12.0),
         child: Row(

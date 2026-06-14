@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 class PrenotazioneEsame {
-
   String idEsame;
   String codiceFiscale;
 

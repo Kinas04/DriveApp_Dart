@@ -35,7 +35,7 @@ class UtenteViewModel extends ChangeNotifier {
   //blocco eseguito automaticamente al lancio per recuperare l'utente loggato e gestire la persistenza offline
   Future<void> _inizializza() async {
     final cfSalvato = await userPrefs.getUtenteLoggato();
-    
+
     //Verifico se l'utente ha una sessione attiva sia localmente che su Firebase Auth
     if (cfSalvato != null && repository.isAutenticato()) {
       //Provo a recuperare i dati aggiornati da Firebase con logica di retry
@@ -66,13 +66,15 @@ class UtenteViewModel extends ChangeNotifier {
   }
 
   //Logica di retry per operazioni critiche di rete
-  Future<void> _eseguiConRetry(Future<void> Function() operazione, {required VoidCallback onFallimentoDefinitivo}) async {
+  Future<void> _eseguiConRetry(Future<void> Function() operazione,
+      {required VoidCallback onFallimentoDefinitivo}) async {
     int tentativi = 0;
     const maxTentativi = 2; //Riprovo una volta dopo il primo fallimento
-    
+
     while (tentativi < maxTentativi) {
       try {
-        await operazione().timeout(const Duration(seconds: 8)); //Timeout di 8 secondi per singola richiesta
+        await operazione().timeout(const Duration(
+            seconds: 8)); //Timeout di 8 secondi per singola richiesta
         return; //Successo
       } catch (e) {
         tentativi++;
@@ -105,7 +107,8 @@ class UtenteViewModel extends ChangeNotifier {
   }
 
   //gestisce la procedura di login verificando le credenziali su Firebase e salvando i dati per l'offline
-  Future<void> eseguiLogin(String cfInserito, String passwordInserita, Function(bool, String) onRisultato) async {
+  Future<void> eseguiLogin(String cfInserito, String passwordInserita,
+      Function(bool, String) onRisultato) async {
     if (cfInserito.trim().isEmpty || passwordInserita.trim().isEmpty) {
       onRisultato(false, "Compila tutti i campi.");
       return;
@@ -124,12 +127,13 @@ class UtenteViewModel extends ChangeNotifier {
     }
 
     try {
-      final utente = await repository.eseguiLogin(cfInserito.trim(), passwordInserita.trim());
+      final utente = await repository.eseguiLogin(
+          cfInserito.trim(), passwordInserita.trim());
       if (utente != null) {
         _utenteLoggato = utente;
         //Salvo sia la sessione che i dati dell'utente per la persistenza (RNF5)
         await userPrefs.salvaUtenteLoggato(cfInserito.trim());
-        await userPrefs.salvaDatiUtente(utente); 
+        await userPrefs.salvaDatiUtente(utente);
         notifyListeners();
         onRisultato(true, "Login eseguito con successo.");
       } else {
@@ -156,13 +160,19 @@ class UtenteViewModel extends ChangeNotifier {
       return;
     }
 
-    if (nome.isEmpty || cognome.isEmpty || eta.isEmpty || cf.isEmpty || password.isEmpty || categoria.isEmpty) {
+    if (nome.isEmpty ||
+        cognome.isEmpty ||
+        eta.isEmpty ||
+        cf.isEmpty ||
+        password.isEmpty ||
+        categoria.isEmpty) {
       onRisultato(false, "Compila tutti i campi.");
       return;
     }
 
     //Validazione dei dati tramite Record di Dart
-    final (bool successoValidazione, String msgValidazione) = validaDatiRegistrazione(nome, cognome, cf, password, eta, categoria);
+    final (bool successoValidazione, String msgValidazione) =
+        validaDatiRegistrazione(nome, cognome, cf, password, eta, categoria);
     if (!successoValidazione) {
       onRisultato(false, msgValidazione);
       return;
@@ -231,8 +241,8 @@ class UtenteViewModel extends ChangeNotifier {
   }
 
   //procedura per cambiare la password verificando prima quella attualmente in uso
-  Future<void> avviaCambioPassword(String vecchiaPassword, String nuovaPassword, Function(bool, String) onRisultato) async {
-
+  Future<void> avviaCambioPassword(String vecchiaPassword, String nuovaPassword,
+      Function(bool, String) onRisultato) async {
     // check connessione
     if (!await networkChecker.isInternetAvailable()) {
       onRisultato(false, "Connessione assente. Riprova quando sei online.");
@@ -249,7 +259,8 @@ class UtenteViewModel extends ChangeNotifier {
 
     //Controllo lunghezza minima password durante la fase di cambio
     if (nuovaPassword.length < 6) {
-      onRisultato(false, "La nuova password deve essere di almeno 6 caratteri.");
+      onRisultato(
+          false, "La nuova password deve essere di almeno 6 caratteri.");
       return;
     }
 
@@ -275,7 +286,6 @@ class UtenteViewModel extends ChangeNotifier {
 
   //elimina definitivamente l'account e tutti i dati correlati, poi esegue il logout
   Future<void> eliminaAccount(Function(bool, String) onRisultato) async {
-
     // check connessione
     if (!await networkChecker.isInternetAvailable()) {
       onRisultato(false, "Devi essere online per eliminare l'account.");
@@ -305,10 +315,12 @@ class UtenteViewModel extends ChangeNotifier {
   ) {
     final regexNomeCognome = RegExp(r"^[a-zA-ZÀ-ÿ\s']+$");
     if (!regexNomeCognome.hasMatch(nome)) return (false, "Nome non valido.");
-    if (!regexNomeCognome.hasMatch(cognome)) return (false, "Cognome non valido.");
+    if (!regexNomeCognome.hasMatch(cognome))
+      return (false, "Cognome non valido.");
 
     final regexCF = RegExp(r"^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$");
-    if (!regexCF.hasMatch(cf.toUpperCase())) return (false, "Codice Fiscale non valido.");
+    if (!regexCF.hasMatch(cf.toUpperCase()))
+      return (false, "Codice Fiscale non valido.");
 
     if (password.length < 6) return (false, "Password troppo corta (min 6).");
 
@@ -316,14 +328,36 @@ class UtenteViewModel extends ChangeNotifier {
     int etaMinima = 18;
     //utilizzo uno switch case per includere tutte le categorie di patente ministeriali e le età minime
     switch (categoria) {
-      case "AM": etaMinima = 14; break;
-      case "A1": case "B1": etaMinima = 16; break;
-      case "A2": case "B": case "B96": case "BE": case "C1": case "C1E": etaMinima = 18; break;
-      case "C": case "CE": case "D1": case "D1E": etaMinima = 21; break;
-      case "A": case "D": case "DE": etaMinima = 24; break;
+      case "AM":
+        etaMinima = 14;
+        break;
+      case "A1":
+      case "B1":
+        etaMinima = 16;
+        break;
+      case "A2":
+      case "B":
+      case "B96":
+      case "BE":
+      case "C1":
+      case "C1E":
+        etaMinima = 18;
+        break;
+      case "C":
+      case "CE":
+      case "D1":
+      case "D1E":
+        etaMinima = 21;
+        break;
+      case "A":
+      case "D":
+      case "DE":
+        etaMinima = 24;
+        break;
     }
 
-    if (etaVal < etaMinima) return (false, "Età minima per $categoria è $etaMinima.");
+    if (etaVal < etaMinima)
+      return (false, "Età minima per $categoria è $etaMinima.");
 
     return (true, "");
   }

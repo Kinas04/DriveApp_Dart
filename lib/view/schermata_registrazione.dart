@@ -18,10 +18,10 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
   final cognomeController = TextEditingController();
   final codiceController = TextEditingController();
   final passwordController = TextEditingController();
-  
+
   String? etaSelezionata;
   String? categoriaSelezionata;
-  
+
   String messaggioErrore = "";
   bool inCaricamento = false;
 
@@ -36,9 +36,25 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
   }
 
   //Elenchi statici per le opzioni dei menu a tendina (Dropdown)
-  final List<String> opzioniEta = List.generate(77, (index) => (index + 14).toString());
+  final List<String> opzioniEta =
+      List.generate(77, (index) => (index + 14).toString());
   final List<String> opzioniCategorie = [
-    "AM", "A1", "A2", "A", "B1", "B", "B96", "BE", "C1", "C1E", "C", "CE", "D1", "D1E", "D", "DE"
+    "AM",
+    "A1",
+    "A2",
+    "A",
+    "B1",
+    "B",
+    "B96",
+    "BE",
+    "C1",
+    "C1E",
+    "C",
+    "CE",
+    "D1",
+    "D1E",
+    "D",
+    "DE"
   ];
 
   //invia i dati al ViewModel per validare e creare il nuovo profilo su Auth e Firestore
@@ -105,21 +121,25 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                     controller: nomeController,
                     onChanged: (v) {
                       // salvataggio posizione cursore
-                      int posizioneCursore = nomeController.selection.base.offset;
+                      int posizioneCursore =
+                          nomeController.selection.base.offset;
 
                       // formattazione testo con funzione viewmodel
                       String testoFormattato = viewModel.formattaNome(v);
 
                       // calcolo formattazione per correzione (spazi o altro)
-                      int differenzaLunghezza = testoFormattato.length - v.length;
-                      int nuovaPosizione = posizioneCursore + differenzaLunghezza;
+                      int differenzaLunghezza =
+                          testoFormattato.length - v.length;
+                      int nuovaPosizione =
+                          posizioneCursore + differenzaLunghezza;
 
                       // formattazione testo e riposizionamento cursore
                       nomeController.value = TextEditingValue(
                         text: testoFormattato,
                         selection: TextSelection.collapsed(
                           // evitiamo crash in posizioni non ammesse
-                          offset: nuovaPosizione.clamp(0, testoFormattato.length),
+                          offset:
+                              nuovaPosizione.clamp(0, testoFormattato.length),
                         ),
                       );
 
@@ -137,21 +157,25 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                     controller: cognomeController,
                     onChanged: (v) {
                       // salvataggio posizione cursore
-                      int posizioneCursore = cognomeController.selection.base.offset;
+                      int posizioneCursore =
+                          cognomeController.selection.base.offset;
 
                       // formattazione testo con funzione viewmodel
                       String testoFormattato = viewModel.formattaNome(v);
 
                       // calcolo formattazione per correzione (spazi o altro)
-                      int differenzaLunghezza = testoFormattato.length - v.length;
-                      int nuovaPosizione = posizioneCursore + differenzaLunghezza;
+                      int differenzaLunghezza =
+                          testoFormattato.length - v.length;
+                      int nuovaPosizione =
+                          posizioneCursore + differenzaLunghezza;
 
                       // formattazione testo e riposizionamento cursore
                       cognomeController.value = TextEditingValue(
                         text: testoFormattato,
                         selection: TextSelection.collapsed(
                           // evitiamo crash in posizioni non ammesse
-                          offset: nuovaPosizione.clamp(0, testoFormattato.length),
+                          offset:
+                              nuovaPosizione.clamp(0, testoFormattato.length),
                         ),
                       );
 
@@ -163,27 +187,32 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   //Campo Codice Fiscale con fix posizione cursore
                   TextField(
                     controller: codiceController,
                     onChanged: (v) {
                       // salvataggio posizione cursore
-                      int posizioneCursore = codiceController.selection.base.offset;
+                      int posizioneCursore =
+                          codiceController.selection.base.offset;
 
                       // formattazione testo con funzione viewmodel
-                      String testoFormattato = viewModel.formattaCodiceFiscale(v);
+                      String testoFormattato =
+                          viewModel.formattaCodiceFiscale(v);
 
                       // calcolo formattazione per correzione (spazi o altro)
-                      int differenzaLunghezza = testoFormattato.length - v.length;
-                      int nuovaPosizione = posizioneCursore + differenzaLunghezza;
+                      int differenzaLunghezza =
+                          testoFormattato.length - v.length;
+                      int nuovaPosizione =
+                          posizioneCursore + differenzaLunghezza;
 
                       // formattazione testo e riposizionamento cursore
                       codiceController.value = TextEditingValue(
                         text: testoFormattato,
                         selection: TextSelection.collapsed(
                           // evitiamo crash in posizioni non ammesse
-                          offset: nuovaPosizione.clamp(0, testoFormattato.length),
+                          offset:
+                              nuovaPosizione.clamp(0, testoFormattato.length),
                         ),
                       );
 
@@ -191,45 +220,53 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                     },
                     decoration: InputDecoration(
                       labelText: "Codice Fiscale",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   //Campo Password con oscuramento
                   TextField(
                     controller: passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: "Password",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   //Menu a tendina per la selezione dell'età dell'utente
                   DropdownButtonFormField<String>(
                     initialValue: etaSelezionata,
                     decoration: InputDecoration(
                       labelText: "Età",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
-                    items: opzioniEta.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                    items: opzioniEta
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .toList(),
                     onChanged: (v) => setState(() => etaSelezionata = v),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   //Selettore per la categoria di patente ministeriale richiesta
                   DropdownButtonFormField<String>(
                     initialValue: categoriaSelezionata,
                     decoration: InputDecoration(
                       labelText: "Patente richiesta",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
-                    items: opzioniCategorie.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                    items: opzioniCategorie
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .toList(),
                     onChanged: (v) => setState(() => categoriaSelezionata = v),
                   ),
-                  
+
                   const SizedBox(height: 8),
                   //Area per la visualizzazione dei messaggi di errore
                   Container(
@@ -242,32 +279,39 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  
+
                   //Pulsante principale per avviare la procedura di registrazione
                   SizedBox(
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: inCaricamento ? null : () => registrazione(viewModel),
+                      onPressed:
+                          inCaricamento ? null : () => registrazione(viewModel),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.secondary,
-                        foregroundColor: Theme.of(context).colorScheme.onSecondary,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onSecondary,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50)),
                       ),
                       child: inCaricamento
                           ? const SizedBox(
                               height: 24,
                               width: 24,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white),
                             )
-                          : const Text("REGISTRATI", style: TextStyle(fontSize: 16)),
+                          : const Text("REGISTRATI",
+                              style: TextStyle(fontSize: 16)),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  const Text("Hai già un account?", style: TextStyle(fontSize: 14)),
+                  const Text("Hai già un account?",
+                      style: TextStyle(fontSize: 14)),
                   const SizedBox(height: 8),
-                  
+
                   //Pulsante per tornare alla schermata di login
                   SizedBox(
                     width: double.infinity,
@@ -275,12 +319,18 @@ class _SchermataRegistrazioneState extends State<SchermataRegistrazione> {
                     child: ElevatedButton.icon(
                       onPressed: widget.onTornaAlLogin,
                       icon: const Icon(Icons.arrow_back),
-                      label: const Text("ACCEDI", style: TextStyle(fontSize: 16)),
+                      label:
+                          const Text("ACCEDI", style: TextStyle(fontSize: 16)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.4),
-                        foregroundColor: Theme.of(context).colorScheme.onSurface,
+                        backgroundColor: Theme.of(context)
+                            .colorScheme
+                            .secondary
+                            .withValues(alpha: 0.4),
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onSurface,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50)),
                       ),
                     ),
                   ),

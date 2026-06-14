@@ -18,8 +18,8 @@ class EsitiViewModel extends ChangeNotifier {
   });
 
   //recupera lo storico degli esiti per l'utente loggato, inclusi i dettagli dell'esame correlato
-  Future<void> caricaEsiti(String cf, Function(List<EsitoEsame>, Map<String, Esame>, bool) onRisultato) async {
-
+  Future<void> caricaEsiti(String cf,
+      Function(List<EsitoEsame>, Map<String, Esame>, bool) onRisultato) async {
     // Controllo connessione tramite l'interfaccia astratta
     if (!await networkChecker.isInternetAvailable()) {
       // Offline: restituiamo subito liste vuote e l'errore a true
@@ -44,7 +44,7 @@ class EsitiViewModel extends ChangeNotifier {
       final dettagli = await repository.getEsamiPerId(ids);
 
       //crea una mappa (ID -> Oggetto Esame) per associare velocemente ogni esito al suo esame corrispondente nella UI
-      final mappaDettagli = { for (var e in dettagli) e.idEsame : e };
+      final mappaDettagli = {for (var e in dettagli) e.idEsame: e};
 
       //invia i dati processati alla schermata segnalando il successo del caricamento
       onRisultato(esiti, mappaDettagli, false);

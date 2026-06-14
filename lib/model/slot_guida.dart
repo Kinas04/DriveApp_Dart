@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 //Classe che rappresenta una singola disponibilità (slot) per una lezione di guida pratica
 class SlotGuida {
-
   String idGuida;
   DateTime data;
   String oraInizio;

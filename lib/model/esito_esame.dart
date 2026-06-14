@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 //Classe che modella l'esito finale di un esame sostenuto dall'utente (es. Idoneo/Respinto)
 class EsitoEsame {
-
   String idEsame;
   String codiceFiscale;
   String esito;
@@ -34,5 +33,4 @@ class EsitoEsame {
       "esito": esito,
     };
   }
-
 }

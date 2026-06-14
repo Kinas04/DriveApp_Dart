@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 //Classe che rappresenta una lezione di teoria programmata nell'autoscuola
 class Lezione {
-
   String idLezione;
   DateTime dataLezione;
   String oraInizio;

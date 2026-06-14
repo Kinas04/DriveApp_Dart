@@ -14,7 +14,7 @@ class _SchermataSicurezzaState extends State<SchermataSicurezza> {
   //Controller per acquisire la vecchia e la nuova password dai campi di testo
   final oldPasswordController = TextEditingController();
   final newPasswordController = TextEditingController();
-  
+
   bool inCaricamento = false;
   String messaggioErrore = "";
 
@@ -42,7 +42,8 @@ class _SchermataSicurezzaState extends State<SchermataSicurezza> {
           setState(() => inCaricamento = false);
           if (successo) {
             //In caso di successo, notifica l'utente e chiude la schermata tornando all'account
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(messaggio)));
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(messaggio)));
             Navigator.pop(context);
           } else {
             //Se la vecchia password è errata o ci sono altri problemi, visualizza l'errore
@@ -58,15 +59,20 @@ class _SchermataSicurezzaState extends State<SchermataSicurezza> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Elimina Account", style: TextStyle(color: Colors.red)),
-        content: const Text("Sei sicuro? Questa operazione è irreversibile e cancellerà tutti i tuoi dati e prenotazioni dal sistema."),
+        title:
+            const Text("Elimina Account", style: TextStyle(color: Colors.red)),
+        content: const Text(
+            "Sei sicuro? Questa operazione è irreversibile e cancellerà tutti i tuoi dati e prenotazioni dal sistema."),
         actions: [
           //Pulsante per annullare l'azione
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("ANNULLA")),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("ANNULLA")),
           //Pulsante distruttivo per procedere alla cancellazione
           TextButton(
             onPressed: () async {
-              Navigator.pop(context); //Chiude il popup prima di avviare la procedura
+              Navigator.pop(
+                  context); //Chiude il popup prima di avviare la procedura
               await viewModel.eliminaAccount((successo, messaggio) {
                 if (mounted) {
                   if (successo) {
@@ -74,7 +80,8 @@ class _SchermataSicurezzaState extends State<SchermataSicurezza> {
                     Navigator.of(context).popUntil((route) => route.isFirst);
                   } else {
                     //Visualizza un errore se la procedura fallisce (es. sessione scaduta che richiede re-login)
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(messaggio)));
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(messaggio)));
                   }
                 }
               });
@@ -101,13 +108,16 @@ class _SchermataSicurezzaState extends State<SchermataSicurezza> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Cambia Password", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                const Text("Cambia Password",
+                    style:
+                        TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 24),
                 //Input per la password attuale
                 TextField(
                   controller: oldPasswordController,
                   obscureText: true,
-                  textInputAction: TextInputAction.next, // Tasto "Avanti" sulla tastiera
+                  textInputAction:
+                      TextInputAction.next, // Tasto "Avanti" sulla tastiera
                   decoration: const InputDecoration(
                     labelText: "Vecchia Password",
                     border: OutlineInputBorder(),
@@ -118,7 +128,8 @@ class _SchermataSicurezzaState extends State<SchermataSicurezza> {
                 TextField(
                   controller: newPasswordController,
                   obscureText: true,
-                  textInputAction: TextInputAction.done, // Spunta sulla tastiera per chiuderla
+                  textInputAction: TextInputAction
+                      .done, // Spunta sulla tastiera per chiuderla
                   decoration: const InputDecoration(
                     labelText: "Nuova Password",
                     border: OutlineInputBorder(),
@@ -126,16 +137,21 @@ class _SchermataSicurezzaState extends State<SchermataSicurezza> {
                 ),
                 const SizedBox(height: 8),
                 //Visualizzazione di eventuali errori di validazione o di sistema
-                Text(messaggioErrore, style: const TextStyle(color: Colors.red)),
+                Text(messaggioErrore,
+                    style: const TextStyle(color: Colors.red)),
                 const SizedBox(height: 16),
                 //Pulsante per attivare l'aggiornamento della password
                 SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: inCaricamento ? null : () => _cambiaPassword(viewModel),
+                    onPressed:
+                        inCaricamento ? null : () => _cambiaPassword(viewModel),
                     child: inCaricamento
-                        ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2))
                         : const Text("AGGIORNA PASSWORD"),
                   ),
                 ),
@@ -143,16 +159,23 @@ class _SchermataSicurezzaState extends State<SchermataSicurezza> {
                 const Divider(),
                 const SizedBox(height: 24),
                 //Sezione dedicata alle azioni irreversibili
-                const Text("Zona Pericolo", style: TextStyle(fontSize: 18, color: Colors.red, fontWeight: FontWeight.bold)),
+                const Text("Zona Pericolo",
+                    style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
-                const Text("L'eliminazione dell'account comporterà la perdita di tutte le prenotazioni, delle guide e degli esiti salvati finora."),
+                const Text(
+                    "L'eliminazione dell'account comporterà la perdita di tutte le prenotazioni, delle guide e degli esiti salvati finora."),
                 const SizedBox(height: 16),
                 //Pulsante per avviare il processo di cancellazione account
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(
                     onPressed: () => _eliminaAccount(viewModel),
-                    style: OutlinedButton.styleFrom(foregroundColor: Colors.red, side: const BorderSide(color: Colors.red)),
+                    style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.red,
+                        side: const BorderSide(color: Colors.red)),
                     child: const Text("ELIMINA ACCOUNT"),
                   ),
                 ),

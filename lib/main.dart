@@ -22,13 +22,13 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   //Configuro il supporto alla localizzazione italiana per la formattazione delle date
   await initializeDateFormatting('it_IT', null);
 
   //Istanzio la repository che verrà condivisa tra tutti i ViewModel (Pattern Dependency Injection)
   final repository = UtenteRepository();
-  
+
   runApp(
     /*Utilizzo MultiProvider per iniettare le dipendenze logiche a livello globale
     Ogni ViewModel viene creato una sola volta e reso accessibile da qualsiasi widget dell'app*/
@@ -44,15 +44,21 @@ void main() async {
         ),
         //ViewModel per la gestione degli eventi del calendario (Lezioni ed Esami)
         ChangeNotifierProvider(
-          create: (_) => CalendarioViewModel(repository: repository, networkChecker: ConnectivityCheckerImpl()),
+          create: (_) => CalendarioViewModel(
+              repository: repository,
+              networkChecker: ConnectivityCheckerImpl()),
         ),
         //ViewModel per la visualizzazione dello storico degli esiti
         ChangeNotifierProvider(
-          create: (_) => EsitiViewModel(repository: repository, networkChecker: ConnectivityCheckerImpl()),
+          create: (_) => EsitiViewModel(
+              repository: repository,
+              networkChecker: ConnectivityCheckerImpl()),
         ),
         //ViewModel dedicato alla logica di prenotazione di nuovi appelli o guide
         ChangeNotifierProvider(
-          create: (_) => PrenotaViewModel(repository: repository, networkChecker: ConnectivityCheckerImpl()),
+          create: (_) => PrenotaViewModel(
+              repository: repository,
+              networkChecker: ConnectivityCheckerImpl()),
         ),
       ],
       //L'intera applicazione (MyApp) è il widget figlio che può usufruire dei provider definiti sopra
@@ -129,7 +135,8 @@ class _RootNavigatorState extends State<RootNavigator> {
                     const SizedBox(height: 16),
                     const Text(
                       "Connessione Assente",
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     const Text(
@@ -160,11 +167,13 @@ class _RootNavigatorState extends State<RootNavigator> {
           child: mostraRegistrazione
               ? SchermataRegistrazione(
                   key: const ValueKey('Registrazione'),
-                  onTornaAlLogin: () => setState(() => mostraRegistrazione = false),
+                  onTornaAlLogin: () =>
+                      setState(() => mostraRegistrazione = false),
                 )
               : SchermataLogin(
                   key: const ValueKey('Login'),
-                  onVaiARegistrazione: () => setState(() => mostraRegistrazione = true),
+                  onVaiARegistrazione: () =>
+                      setState(() => mostraRegistrazione = true),
                 ),
         );
       },

@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 //Classe che rappresenta un appello d'esame (teorico o pratico) nel sistema
 class Esame {
-
   String idEsame;
   DateTime data;
   String oraInizio;
@@ -49,5 +48,4 @@ class Esame {
       "tipologia": tipologia,
     };
   }
-
 }

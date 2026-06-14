@@ -11,10 +11,11 @@ class ConnectivityCheckerImpl implements ConnectivityChecker {
         await Connectivity().checkConnectivity();
 
     // Se la lista contiene solo 'none' o risulta vuota, consideriamo il dispositivo offline
-    if (connectivityResult.isEmpty || connectivityResult.contains(ConnectivityResult.none)) {
+    if (connectivityResult.isEmpty ||
+        connectivityResult.contains(ConnectivityResult.none)) {
       return false;
     }
-    
+
     // Altrimenti, se è presente almeno una modalità di connessione attiva, restituiamo true
     return true;
   }

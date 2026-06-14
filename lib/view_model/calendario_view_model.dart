@@ -22,10 +22,9 @@ class CalendarioViewModel extends ChangeNotifier {
   Future<void> caricaEventiCalendario(
       DateTime data,
       int tab,
-      Function(List<Lezione>, List<Esame>, List<SlotGuida>, bool) onRisultato
-      ) async {
-
-    // Controlliamo innanzitutto lo stato della connessione tramite l'interfaccia 
+      Function(List<Lezione>, List<Esame>, List<SlotGuida>, bool)
+          onRisultato) async {
+    // Controlliamo innanzitutto lo stato della connessione tramite l'interfaccia
     if (!await networkChecker.isInternetAvailable()) {
       // Se non c'è connessione, restituiamo subito liste vuote e flag di errore a 'true'
       onRisultato([], [], [], true);

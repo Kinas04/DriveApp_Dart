@@ -22,9 +22,8 @@ class PrenotaViewModel extends ChangeNotifier {
       String categoria,
       String cf,
       int tab,
-      Function(List<Esame>, List<SlotGuida>, Set<String>, bool) onRisultato
-      ) async {
-
+      Function(List<Esame>, List<SlotGuida>, Set<String>, bool)
+          onRisultato) async {
     // check connessione per errore istantaneo tramite interfaccia astratta
     if (!await networkChecker.isInternetAvailable()) {
       onRisultato([], [], {}, true);
@@ -46,9 +45,9 @@ class PrenotaViewModel extends ChangeNotifier {
         //Recupero tutti gli slot guida futuri filtrati per categoria
         final tutteLeGuide = await repository.getGuideFuture(categoria, adesso);
         //Filtro per mostrare solo le guide libere o quelle già prenotate dall'utente loggato
-        final guideVisibili = tutteLeGuide.where((g) =>
-        g.utentePrenotato == null || g.utentePrenotato == cf
-        ).toList();
+        final guideVisibili = tutteLeGuide
+            .where((g) => g.utentePrenotato == null || g.utentePrenotato == cf)
+            .toList();
         //Identifico quali di queste guide sono già state prenotate dall'utente
         final prenotati = guideVisibili
             .where((g) => g.utentePrenotato == cf)
@@ -63,11 +62,12 @@ class PrenotaViewModel extends ChangeNotifier {
   }
 
   //salva la prenotazione per un esame o una guida specifica dell'utente loggato
-  Future<void> prenotaElemento(int tab, String id, String cf, Function(bool, String) onRisultato) async {
-
+  Future<void> prenotaElemento(
+      int tab, String id, String cf, Function(bool, String) onRisultato) async {
     // controllo preliminare connessione tramite interfaccia astratta
     if (!await networkChecker.isInternetAvailable()) {
-      onRisultato(false, "Nessuna connessione internet. Impossibile prenotare.");
+      onRisultato(
+          false, "Nessuna connessione internet. Impossibile prenotare.");
       return;
     }
 
@@ -86,11 +86,12 @@ class PrenotaViewModel extends ChangeNotifier {
   }
 
   //annulla una prenotazione esistente restituendo l'elemento allo stato disponibile
-  Future<void> annullaPrenotazione(int tab, String id, String cf, Function(bool, String) onRisultato) async {
-
+  Future<void> annullaPrenotazione(
+      int tab, String id, String cf, Function(bool, String) onRisultato) async {
     // controllo preliminare connessione tramite interfaccia astratta
     if (!await networkChecker.isInternetAvailable()) {
-      onRisultato(false, "Nessuna connessione internet. Impossibile annullare.");
+      onRisultato(
+          false, "Nessuna connessione internet. Impossibile annullare.");
       return;
     }
 
