@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import '../model/lezione.dart';
 import '../model/esame.dart';
 import '../model/slot_guida.dart';
 import '../repository/repository_interface.dart';
+import '../repository/connectivity_checker.dart';
 
 //ViewModel che gestisce la logica del calendario recuperando lezioni, esami e guide
 class CalendarioViewModel extends ChangeNotifier {
   //Riferimento alla repository per l'accesso ai dati su Firebase
   final RepositoryInterface repository;
+  //Riferimento all'interfaccia per il controllo della rete
+  final ConnectivityChecker networkChecker;
 
-  CalendarioViewModel({required this.repository});
+  //Iniezione delle dipendenze nel costruttore
+  CalendarioViewModel({
+    required this.repository,
+    required this.networkChecker,
+  });
 
   //carica le lezioni, gli esami o le guide in base alla data e al tab selezionato nella UI
   Future<void> caricaEventiCalendario(
@@ -19,9 +25,8 @@ class CalendarioViewModel extends ChangeNotifier {
       Function(List<Lezione>, List<Esame>, List<SlotGuida>, bool) onRisultato
       ) async {
 
-    // Controlliamo innanzitutto lo stato della connessione
-    final List<ConnectivityResult> connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult.contains(ConnectivityResult.none)) {
+    // Controlliamo innanzitutto lo stato della connessione tramite l'interfaccia 
+    if (!await networkChecker.isInternetAvailable()) {
       // Se non c'è connessione, restituiamo subito liste vuote e flag di errore a 'true'
       onRisultato([], [], [], true);
       return;

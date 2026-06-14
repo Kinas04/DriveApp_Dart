@@ -16,47 +16,32 @@ class SchermataPrenota extends StatefulWidget {
   State<SchermataPrenota> createState() => _SchermataPrenotaState();
 }
 
-class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProviderStateMixin {
-  //Controller per la gestione dei due tab principali (Esami e Guide)
-  late TabController _tabController;
+class _SchermataPrenotaState extends State<SchermataPrenota> {
+
+  // variabile per tab selezionata
+  int _tabSelezionato = 0;
 
   //Liste locali per memorizzare i dati ricevuti dal database
   List<Esame> _listaEsami = [];
   List<SlotGuida> _listaGuide = [];
-  
+
   //Insieme di identificativi per tracciare quali elementi l'utente ha già prenotato
   Set<String> _elementiPrenotati = {};
-  
+
   bool _inCaricamento = true;
   bool _erroreCaricamento = false;
-  
+
   //Flag per gestire lo stato di attesa durante la scrittura sul database
   bool _inPrenotazione = false;
 
   @override
   void initState() {
     super.initState();
-    //Inizializziamo il TabController per gestire lo switch tra le due categorie di prenotazione
-    _tabController = TabController(length: 2, vsync: this);
-    
-    //Aggiungiamo un listener per ricaricare i dati ogni volta che l'utente cambia tab
-    _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) {
-        _caricaDati();
-      }
-    });
 
     //Avviamo il caricamento iniziale dei dati non appena il frame è pronto
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _caricaDati();
     });
-  }
-
-  @override
-  void dispose() {
-    //Liberiamo le risorse del controller quando la schermata viene chiusa
-    _tabController.dispose();
-    super.dispose();
   }
 
   //chiamata al ViewModel per caricare le liste degli elementi prenotabili filtrati per l'utente loggato
@@ -77,8 +62,8 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
     await prenotaViewModel.caricaElementiPrenotabili(
       utente.categoriaRichiesta,
       utente.codiceFiscale,
-      _tabController.index,
-      (esami, guide, prenotati, errore) {
+      _tabSelezionato,
+          (esami, guide, prenotati, errore) {
         //controllo mounted per evitare errori se l'utente cambia pagina durante il caricamento
         if (mounted) {
           setState(() {
@@ -97,52 +82,47 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
   void _mostraPopupConferma(String id) {
     showDialog(
       context: context,
-      barrierDismissible: !_inPrenotazione, //Impedisce la chiusura accidentale durante il salvataggio
+      barrierDismissible: !_inPrenotazione,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           return AlertDialog(
             title: const Text("Conferma Prenotazione"),
             content: const Text("Vuoi confermare la prenotazione per questo elemento?"),
             actions: [
-              //Pulsante per annullare l'operazione e chiudere il dialog
               TextButton(
                 onPressed: _inPrenotazione ? null : () => Navigator.pop(context),
                 child: const Text("ANNULLA"),
               ),
-              //Pulsante per procedere con la prenotazione effettiva
               TextButton(
                 onPressed: _inPrenotazione ? null : () async {
                   setDialogState(() => _inPrenotazione = true);
-                  
+
                   final utenteViewModel = Provider.of<UtenteViewModel>(context, listen: false);
                   final prenotaViewModel = Provider.of<PrenotaViewModel>(context, listen: false);
 
                   final cf = utenteViewModel.utenteLoggato?.codiceFiscale;
                   if (cf == null) return;
 
-                  //Invio della richiesta di prenotazione al server
                   await prenotaViewModel.prenotaElemento(
-                    _tabController.index,
+                    _tabSelezionato,
                     id,
                     cf,
-                    (successo, messaggio) {
-                      //evito errori se l'utente chiude il popup o cambia pagina durante la prenotazione
+                        (successo, messaggio) {
                       if (mounted) {
                         setDialogState(() => _inPrenotazione = false);
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(messaggio)),
                         );
-                        //Se la prenotazione ha successo, ricarichiamo la lista aggiornata
                         if (successo) {
-                          _caricaDati(); 
+                          _caricaDati();
                         }
                       }
                     },
                   );
                 },
-                child: _inPrenotazione 
-                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) 
+                child: _inPrenotazione
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
                     : const Text("CONFERMA"),
               ),
             ],
@@ -170,27 +150,24 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
               TextButton(
                 onPressed: _inPrenotazione ? null : () async {
                   setDialogState(() => _inPrenotazione = true);
-                  
+
                   final utenteViewModel = Provider.of<UtenteViewModel>(context, listen: false);
                   final prenotaViewModel = Provider.of<PrenotaViewModel>(context, listen: false);
 
                   final cf = utenteViewModel.utenteLoggato?.codiceFiscale;
                   if (cf == null) return;
 
-                  //Chiamata al metodo di cancellazione nel ViewModel
                   await prenotaViewModel.annullaPrenotazione(
-                    _tabController.index,
+                    _tabSelezionato,
                     id,
                     cf,
-                    (successo, messaggio) {
-                      //stessa verifica per l'annullamento: procedo solo se il widget esiste ancora
+                        (successo, messaggio) {
                       if (mounted) {
                         setDialogState(() => _inPrenotazione = false);
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(messaggio)),
                         );
-                        //Ricarichiamo i dati per rendere l'elemento nuovamente prenotabile (tornerà nero)
                         if (successo) {
                           _caricaDati();
                         }
@@ -228,7 +205,6 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 16),
-                    // Se siamo in landscape, limitiamo la larghezza del selettore a 400
                     isCompatto
                         ? _buildSelettoreTabs()
                         : Center(
@@ -251,7 +227,6 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
     );
   }
 
-  //settiamo il titolo della pagina con un padding standard per l'allineamento globale
   Widget _buildTitolo(bool isCompatto) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
@@ -271,8 +246,8 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
     );
   }
 
-  //disegna il selettore a tab personalizzato per switchare tra le categorie "Esami" e "Guide"
   Widget _buildSelettoreTabs() {
+    final tabs = ["Esami", "Guide"];
     return Container(
       height: 56,
       padding: const EdgeInsets.all(4),
@@ -280,30 +255,46 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
         color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(28),
       ),
-      child: TabBar(
-        controller: _tabController,
-        indicator: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(24),
-        ),
-        indicatorSize: TabBarIndicatorSize.tab,
-        dividerColor: Colors.transparent,
-        labelColor: Colors.white,
-        unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
-        tabs: const [
-          Tab(text: "Esami"),
-          Tab(text: "Guide"),
-        ],
+      child: Row(
+        children: List.generate(tabs.length, (index) {
+          final isSelezionato = _tabSelezionato == index;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                if (_tabSelezionato != index) {
+                  setState(() => _tabSelezionato = index);
+                  _caricaDati();
+                }
+              },
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isSelezionato
+                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Text(
+                  tabs[index],
+                  style: TextStyle(
+                    // Colore del testo adattato al tema quando non è selezionato
+                    color: isSelezionato ? Colors.white : Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
       ),
     );
   }
 
-  //mostra un testo di guida dinamico che varia in base alla disponibilità degli elementi caricati
   Widget _buildSottotitolo() {
     if (_inCaricamento || _erroreCaricamento) return const SizedBox.shrink();
 
     String testo = "";
-    if (_tabController.index == 0) {
+    if (_tabSelezionato == 0) {
       testo = _listaEsami.isEmpty ? "Nessun esame disponibile." : "Scegli un esame da prenotare:";
     } else {
       testo = _listaGuide.isEmpty ? "Nessuna guida disponibile." : "Scegli una guida da prenotare:";
@@ -315,7 +306,6 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
     );
   }
 
-  //gestisce il corpo della pagina caricando la ListView corretta o l'indicatore di caricamento
   Widget _buildContenuto() {
     if (_inCaricamento) {
       return const Center(child: CircularProgressIndicator());
@@ -324,21 +314,19 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
     if (_erroreCaricamento) {
       return Center(
         child: Text(
-          _tabController.index == 0 ? "Errore caricamento esami." : "Errore caricamento guide.",
+          _tabSelezionato == 0 ? "Errore caricamento esami." : "Errore caricamento guide.",
           style: const TextStyle(color: Colors.red),
         ),
       );
     }
 
-    //Seleziono la lista di dati da visualizzare in base all'indice del TabController
-    final items = _tabController.index == 0 ? _listaEsami : _listaGuide;
+    final items = _tabSelezionato == 0 ? _listaEsami : _listaGuide;
 
     return ListView.separated(
       itemCount: items.length,
       separatorBuilder: (context, index) => const Divider(height: 1),
       itemBuilder: (context, index) {
         final item = items[index];
-        //Rendering dinamico: costruisco la riga passando parametri specifici per Esame o Guida
         if (item is Esame) {
           return _buildRigaPrenotazione(
             id: item.idEsame,
@@ -361,7 +349,6 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
     );
   }
 
-  //costruisce la riga interattiva della lista: cambia colore (verde) se l'elemento è già stato prenotato
   Widget _buildRigaPrenotazione({
     required String id,
     required String titolo,
@@ -370,20 +357,15 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
     required bool isPrenotato,
   }) {
     final formatData = DateFormat('EEE d MMM', 'it_IT');
-    //Se l'elemento è già prenotato, usiamo il verde e l'icona spunta, altrimenti nero e orologio
     final Color colorePrincipale = isPrenotato ? Colors.green : Colors.black;
     final IconData iconaStato = isPrenotato ? Icons.check : Icons.access_time;
 
-    //Sostanzialmente, questa funzione mostra l'effetto onda al tocco (InkWell) per rendere la riga cliccabile
     return InkWell(
-      /*Se l'elemento non è ancora prenotato, apre il popup di conferma.
-      Se è già prenotato, apre il popup per permetterne l'annullamento (RNF5)*/
       onTap: () => isPrenotato ? _mostraPopupAnnulla(id) : _mostraPopupConferma(id),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12.0),
         child: Row(
           children: [
-            //Icona indicativa dello stato della prenotazione
             Icon(iconaStato, color: colorePrincipale, size: 24),
             const SizedBox(width: 16),
             Expanded(
@@ -408,7 +390,6 @@ class _SchermataPrenotaState extends State<SchermataPrenota> with TickerProvider
                 ],
               ),
             ),
-            //Mostra una freccia verso destra solo se l'elemento è ancora prenotabile
             if (!isPrenotato)
               const Icon(Icons.keyboard_arrow_right, color: Colors.grey),
           ],

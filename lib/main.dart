@@ -44,15 +44,15 @@ void main() async {
         ),
         //ViewModel per la gestione degli eventi del calendario (Lezioni ed Esami)
         ChangeNotifierProvider(
-          create: (_) => CalendarioViewModel(repository: repository),
+          create: (_) => CalendarioViewModel(repository: repository, networkChecker: ConnectivityCheckerImpl()),
         ),
         //ViewModel per la visualizzazione dello storico degli esiti
         ChangeNotifierProvider(
-          create: (_) => EsitiViewModel(repository: repository),
+          create: (_) => EsitiViewModel(repository: repository, networkChecker: ConnectivityCheckerImpl()),
         ),
         //ViewModel dedicato alla logica di prenotazione di nuovi appelli o guide
         ChangeNotifierProvider(
-          create: (_) => PrenotaViewModel(repository: repository),
+          create: (_) => PrenotaViewModel(repository: repository, networkChecker: ConnectivityCheckerImpl()),
         ),
       ],
       //L'intera applicazione (MyApp) è il widget figlio che può usufruire dei provider definiti sopra

@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import '../model/esame.dart';
 import '../model/slot_guida.dart';
 import '../repository/repository_interface.dart';
+import '../repository/connectivity_checker.dart';
 
 //ViewModel dedicato alla gestione delle prenotazioni di esami e guide da parte dell'utente
 class PrenotaViewModel extends ChangeNotifier {
   //Dipendenza dalla repository per le operazioni di lettura e scrittura su Firestore
   final RepositoryInterface repository;
+  //Riferimento all'interfaccia per il controllo della rete
+  final ConnectivityChecker networkChecker;
 
-  PrenotaViewModel({required this.repository});
+  //Iniezione delle dipendenze nel costruttore
+  PrenotaViewModel({
+    required this.repository,
+    required this.networkChecker,
+  });
 
   //recupera la lista degli elementi (esami o guide) che l'utente può visualizzare e prenotare
   Future<void> caricaElementiPrenotabili(
@@ -19,9 +25,8 @@ class PrenotaViewModel extends ChangeNotifier {
       Function(List<Esame>, List<SlotGuida>, Set<String>, bool) onRisultato
       ) async {
 
-    // check connessione per errore istantaneo
-    final List<ConnectivityResult> connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult.contains(ConnectivityResult.none)) {
+    // check connessione per errore istantaneo tramite interfaccia astratta
+    if (!await networkChecker.isInternetAvailable()) {
       onRisultato([], [], {}, true);
       return;
     }
@@ -60,9 +65,8 @@ class PrenotaViewModel extends ChangeNotifier {
   //salva la prenotazione per un esame o una guida specifica dell'utente loggato
   Future<void> prenotaElemento(int tab, String id, String cf, Function(bool, String) onRisultato) async {
 
-    // controllo preliminare connessione
-    final List<ConnectivityResult> connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult.contains(ConnectivityResult.none)) {
+    // controllo preliminare connessione tramite interfaccia astratta
+    if (!await networkChecker.isInternetAvailable()) {
       onRisultato(false, "Nessuna connessione internet. Impossibile prenotare.");
       return;
     }
@@ -84,9 +88,8 @@ class PrenotaViewModel extends ChangeNotifier {
   //annulla una prenotazione esistente restituendo l'elemento allo stato disponibile
   Future<void> annullaPrenotazione(int tab, String id, String cf, Function(bool, String) onRisultato) async {
 
-    // controllo preliminare connessione
-    final List<ConnectivityResult> connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult.contains(ConnectivityResult.none)) {
+    // controllo preliminare connessione tramite interfaccia astratta
+    if (!await networkChecker.isInternetAvailable()) {
       onRisultato(false, "Nessuna connessione internet. Impossibile annullare.");
       return;
     }

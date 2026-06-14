@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import '../model/esito_esame.dart';
 import '../model/esame.dart';
 import '../repository/repository_interface.dart';
+import '../repository/connectivity_checker.dart';
 
 //ViewModel responsabile della gestione e visualizzazione degli esiti degli esami sostenuti
 class EsitiViewModel extends ChangeNotifier {
   //Dipendenza dalla repository per l'interazione con i dati su Firestore
   final RepositoryInterface repository;
+  //Riferimento all'interfaccia per il controllo della rete
+  final ConnectivityChecker networkChecker;
 
-  EsitiViewModel({required this.repository});
+  //Iniezione delle dipendenze nel costruttore
+  EsitiViewModel({
+    required this.repository,
+    required this.networkChecker,
+  });
 
   //recupera lo storico degli esiti per l'utente loggato, inclusi i dettagli dell'esame correlato
   Future<void> caricaEsiti(String cf, Function(List<EsitoEsame>, Map<String, Esame>, bool) onRisultato) async {
 
-    // Controllo connessione
-    final List<ConnectivityResult> connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult.contains(ConnectivityResult.none)) {
+    // Controllo connessione tramite l'interfaccia astratta
+    if (!await networkChecker.isInternetAvailable()) {
       // Offline: restituiamo subito liste vuote e l'errore a true
       onRisultato([], {}, true);
       return;
