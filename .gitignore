@@ -15,6 +15,7 @@ pill-*.symbolication.json
 .settings/
 .vscode/
 .idea/
+.artifacts/
 
 # OS-specific files
 .DS_Store
@@ -26,3 +27,6 @@ android/app/google-services.json # If you want to keep Firebase config private, 
 
 # Local configuration
 .env
+drive_app_dart.iml
+DriveApp_Dart.iml
+android/drive_app_dart_android.iml
