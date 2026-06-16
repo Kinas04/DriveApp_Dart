@@ -3,25 +3,16 @@ De Cinque Nicola, Gonzato Cristian
 Programmazione Mobile A.A. 2025-2026  
 UNIVPM
 
-## Cos'è DriveAPP?
 
-DriveAPP è un’app che si occupa di fornire agli allievi di autoscuole uno strumento per poter gestire ed affrontare il proprio percorso per l’ottenimento di una patente di guida.
-
-La principale funzionalità è la possibilità di visualizzare il calendario completo delle lezioni tenute dall’autoscuola, delle sessioni d’esame disponibili e degli slot orari disponibili per effettuare esercitazioni pratiche.
-
-Si possono effettuare prenotazioni per gli esami e per le guide, visualizzandole in una sezione dedicata, che ne riepiloga il giorno e l’orario.
-
-Si possono visualizzare gli esiti degli esami sostenuti nell’apposita sezione.
-
-L’accesso all’app deve avvenire attraverso delle credenziali che comprendono il codice fiscale dell’allievo e una password scelta in fase di registrazione. È possibile effettuare la registrazione dalla schermata di login al primo utilizzo dell’app.
-
-### Si riassumono le macro-categorie di utilizzo:
-
+Per la realizzazione dell’app Flutter è stata omessa la macro-area di gestione dei quiz, pertanto le macro-categorie di utilizzo si riassumono in:
 - Visualizzazione del calendario completo di lezioni, guide ed esami;
 - Prenotazione di guide e di esami con visualizzazione del riepilogo;
-- Visualizzazione degli esiti degli esami sostenuti;
-- Registrazione dell’account al primo accesso;
-- Modifica della password.
+- Eliminazione prenotazioni effettuate;
+- Visualizzazione degli esiti degli esami sostenuti con visualizzazione dei dettagli;
+- Registrazione del nuovo account utente;
+- Accesso all’account utente esistente;
+- Modifica della password dell’account utente;
+- Eliminazione dell’account utente.
 
 ## Credenziali per testare l'app senza registrazione
 
