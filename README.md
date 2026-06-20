@@ -14,6 +14,8 @@ Per la realizzazione dell’app Flutter è stata omessa la macro-area di gestion
 - Modifica della password dell’account utente;
 - Eliminazione dell’account utente.
 
+Non sono presenti dipendenze o librerie esterne da citare, in quanto sono tutte "first party". Anche "provider" e "connectivity_plus" nonostante siano dipendenze non-Google, sono standard per Flutter.
+
 ## Credenziali per testare l'app senza registrazione
 
 Codice fiscale: "RSSSMN08E30H501E"  
